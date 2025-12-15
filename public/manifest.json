@@ -1,0 +1,22 @@
+{
+  "name": "TORNØ - Passi di Montagna",
+  "short_name": "TORNØ",
+  "description": "App per motociclisti e automobilisti - Passi di montagna",
+  "theme_color": "#1a1a1a",
+  "background_color": "#1a1a1a",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
