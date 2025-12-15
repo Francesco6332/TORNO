@@ -19,14 +19,7 @@ export default function PassoCard({ passo }: PassoCardProps) {
   
   const imageUrl = getPassoImageUrl(passo);
 
-  // Debug temporaneo
-  if (import.meta.env.DEV && imageUrl) {
-    console.log(`[PassoCard] ${passo.name}:`, imageUrl);
-  }
-
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    const target = e.target as HTMLImageElement;
-    console.error(`[PassoCard] Errore caricamento immagine per ${passo.name}:`, target.src);
+  const handleImageError = () => {
     setImageError(true);
   };
 
