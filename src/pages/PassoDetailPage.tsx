@@ -20,6 +20,13 @@ export default function PassoDetailPage() {
 
   const imageUrl = passo ? getPassoImageUrl(passo) : null;
 
+  const handleImageError = () => {
+    if (passo) {
+      console.error(`❌ Errore caricamento immagine per ${passo.name}:`, imageUrl);
+    }
+    setImageError(true);
+  };
+
   useEffect(() => {
     if (passo) {
       setIsFavorite(favoritesStorage.has(passo.id));
@@ -134,7 +141,7 @@ export default function PassoDetailPage() {
             alt={passo.name}
             className="w-full h-64 md:h-96 object-cover"
             loading="lazy"
-            onError={() => setImageError(true)}
+            onError={handleImageError}
           />
         </div>
       )}

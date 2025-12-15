@@ -19,6 +19,11 @@ export default function PassoCard({ passo }: PassoCardProps) {
   
   const imageUrl = getPassoImageUrl(passo);
 
+  const handleImageError = () => {
+    console.error(`❌ Errore caricamento immagine per ${passo.name}:`, imageUrl);
+    setImageError(true);
+  };
+
   const toggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -43,7 +48,7 @@ export default function PassoCard({ passo }: PassoCardProps) {
             alt={passo.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
-            onError={() => setImageError(true)}
+            onError={handleImageError}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

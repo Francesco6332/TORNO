@@ -40,10 +40,8 @@ export const getPassoImageUrl = (passo: Passo): string | null => {
     
     // Altrimenti costruisci l'URL con Digital Ocean Spaces
     const fullUrl = getImageUrl(imagePath);
-    // Verifica che sia stato costruito un URL completo, non solo un path
-    if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
-      console.warn(`⚠️ Impossibile costruire URL completo per: ${imagePath}`);
-      console.warn(`   Verifica la configurazione di Digital Ocean Spaces`);
+    if (import.meta.env.DEV) {
+      console.log(`🖼️ Immagine per ${passo.name}:`, { imagePath, fullUrl });
     }
     return fullUrl;
   }
@@ -51,10 +49,8 @@ export const getPassoImageUrl = (passo: Passo): string | null => {
   // Genera automaticamente il path basandosi sul nome
   const autoPath = generatePassoImagePath(passo.name);
   const fullUrl = getImageUrl(autoPath);
-  // Verifica che sia stato costruito un URL completo
-  if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
-    console.warn(`⚠️ Impossibile costruire URL completo per: ${autoPath}`);
-    console.warn(`   Verifica la configurazione di Digital Ocean Spaces`);
+  if (import.meta.env.DEV) {
+    console.log(`🖼️ Immagine auto-generata per ${passo.name}:`, { autoPath, fullUrl });
   }
   return fullUrl;
 };
