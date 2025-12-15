@@ -17,9 +17,15 @@ if (import.meta.env.DEV) {
   if (!hasConfig) {
     console.warn('⚠️ Digital Ocean Spaces non configurato');
     console.warn('   Aggiungi nel file .env:');
-    console.warn('   VITE_DO_SPACES_BUCKET=your-bucket-name');
-    console.warn('   VITE_DO_SPACES_REGION=nyc3');
-    console.warn('   VITE_DO_SPACES_CDN_ENDPOINT=https://your-cdn-endpoint.com (opzionale)');
+    console.warn('   VITE_DO_SPACES_BUCKET=torno');
+    console.warn('   VITE_DO_SPACES_REGION=nyc3 (o la tua regione)');
+    console.warn('   VITE_DO_SPACES_CDN_ENDPOINT=https://torno.nyc3.cdn.digitaloceanspaces.com (opzionale)');
+  } else {
+    console.log('✅ Digital Ocean Spaces configurato:', {
+      bucket: DO_SPACES_CONFIG.bucket || 'non configurato',
+      region: DO_SPACES_CONFIG.region,
+      cdn: DO_SPACES_CONFIG.cdnEndpoint ? 'abilitato' : 'disabilitato',
+    });
   }
 }
 
