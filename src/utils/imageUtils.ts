@@ -1,4 +1,63 @@
 import { getImageUrl } from '@/config/digitalOcean';
+import type { Passo } from '@/types';
+
+/**
+ * Genera il path dell'immagine basandosi sul nome del passo
+ * Formato: passi/nomepasso-pass
+ * Esempio: "Passo Falzarego" -> "passi/falzarego-pass"
+ */
+export const generatePassoImagePath = (passoName: string): string => {
+  // Rimuovi prefissi comuni
+  let name = passoName
+    .replace(/^Passo\s+(del|dello|della|di|dei|degli)\s+/i, '')
+    .replace(/^Passo\s+/i, '')
+    .trim();
+
+  // Converti in lowercase e sostituisci spazi con trattini
+  name = name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, ''); // Rimuovi accenti
+
+  return `passi/${name}-pass`;
+};
+
+/**
+ * Ottiene l'URL dell'immagine per un passo
+ * Se il passo ha immagini esplicite, usa quelle
+ * Altrimenti genera automaticamente il path basandosi sul nome
+ */
+export const getPassoImageUrl = (passo: Passo): string | null => {
+  // Se ci sono immagini esplicite, usa la prima
+  if (passo.images && passo.images.length > 0 && passo.images[0]) {
+    const imagePath = passo.images[0];
+    
+    // Se è già un URL completo, restituiscilo
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+    
+    // Altrimenti costruisci l'URL con Digital Ocean Spaces
+    const fullUrl = getImageUrl(imagePath);
+    // Verifica che sia stato costruito un URL completo, non solo un path
+    if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+      console.warn(`⚠️ Impossibile costruire URL completo per: ${imagePath}`);
+      console.warn(`   Verifica la configurazione di Digital Ocean Spaces`);
+    }
+    return fullUrl;
+  }
+
+  // Genera automaticamente il path basandosi sul nome
+  const autoPath = generatePassoImagePath(passo.name);
+  const fullUrl = getImageUrl(autoPath);
+  // Verifica che sia stato costruito un URL completo
+  if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+    console.warn(`⚠️ Impossibile costruire URL completo per: ${autoPath}`);
+    console.warn(`   Verifica la configurazione di Digital Ocean Spaces`);
+  }
+  return fullUrl;
+};
 
 /**
  * Ottiene l'URL completo di un'immagine

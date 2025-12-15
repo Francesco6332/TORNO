@@ -10,16 +10,21 @@ import { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale/it';
+import { getPassoImageUrl } from '@/utils/imageUtils';
 
 export default function PassoDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: passo, isLoading, error } = usePasso(id || '');
   const [isFavorite, setIsFavorite] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const imageUrl = passo ? getPassoImageUrl(passo) : null;
 
   useEffect(() => {
     if (passo) {
       setIsFavorite(favoritesStorage.has(passo.id));
       recentViewsStorage.add(passo.id);
+      setImageError(false); // Reset error quando cambia passo
     }
   }, [passo]);
 
@@ -122,13 +127,14 @@ export default function PassoDetailPage() {
       </div>
 
       {/* Main Image */}
-      {passo.images && passo.images[0] && (
+      {imageUrl && !imageError && (
         <div className="mb-8 rounded-lg overflow-hidden">
           <img
-            src={passo.images[0]}
+            src={imageUrl}
             alt={passo.name}
             className="w-full h-64 md:h-96 object-cover"
             loading="lazy"
+            onError={() => setImageError(true)}
           />
         </div>
       )}

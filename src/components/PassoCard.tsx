@@ -6,6 +6,7 @@ import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import type { Passo } from '@/types';
 import clsx from 'clsx';
+import { getPassoImageUrl } from '@/utils/imageUtils';
 
 interface PassoCardProps {
   passo: Passo;
@@ -13,7 +14,10 @@ interface PassoCardProps {
 
 export default function PassoCard({ passo }: PassoCardProps) {
   const [isFavorite, setIsFavorite] = useState(favoritesStorage.has(passo.id));
+  const [imageError, setImageError] = useState(false);
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
+  
+  const imageUrl = getPassoImageUrl(passo);
 
   const toggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -33,12 +37,13 @@ export default function PassoCard({ passo }: PassoCardProps) {
       className="group block bg-dark-800 rounded-lg overflow-hidden border border-dark-700 hover:border-primary-600 transition-all duration-300 hover:shadow-lg hover:shadow-primary-900/20"
     >
       <div className="relative h-48 bg-gradient-to-br from-dark-700 to-dark-900 overflow-hidden">
-        {passo.images && passo.images[0] ? (
+        {imageUrl && !imageError ? (
           <img
-            src={passo.images[0]}
+            src={imageUrl}
             alt={passo.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
