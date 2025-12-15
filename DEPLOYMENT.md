@@ -117,8 +117,8 @@ aws s3 cp image.jpg s3://your-space-name/passi/passo-id/image.jpg --endpoint-url
 ### 2. Abilita Authentication
 
 1. Vai su "Authentication" > "Get Started"
-2. Abilita "Email/Password"
-3. Abilita "Google" come provider
+2. Abilita "Google" come provider di autenticazione
+3. Configura il provider Google con il tuo Client ID e Client Secret (opzionale, Firebase gestisce automaticamente)
 
 ### 3. Crea Firestore Database
 

@@ -7,10 +7,7 @@ import PassoCard from '@/components/PassoCard';
 import { favoritesStorage, recentViewsStorage } from '@/utils/storage';
 
 export default function ProfilePage() {
-  const { user, loading, signIn, signUp, signInWithGoogle, logout } = useAuth();
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { user, loading, signInWithGoogle, logout } = useAuth();
   const [error, setError] = useState('');
 
   const { data: allPassi = [] } = usePassi();
@@ -20,23 +17,9 @@ export default function ProfilePage() {
   const favorites = allPassi.filter(p => favoriteIds.includes(p.id));
   const recent = allPassi.filter(p => recentIds.includes(p.id));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    try {
-      if (isSignUp) {
-        await signUp(email, password);
-      } else {
-        await signIn(email, password);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Errore durante l\'autenticazione');
-    }
-  };
-
   const handleGoogleSignIn = async () => {
     try {
+      setError('');
       await signInWithGoogle();
     } catch (err: any) {
       setError(err.message || 'Errore durante l\'autenticazione con Google');
@@ -61,7 +44,7 @@ export default function ProfilePage() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-display text-white mb-2">Accedi</h1>
             <p className="text-gray-400">
-              {isSignUp ? 'Crea un account' : 'Accedi al tuo account'}
+              Accedi
             </p>
           </div>
 
@@ -70,52 +53,6 @@ export default function ProfilePage() {
               {error}
             </div>
           )}
-
-          <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="tuo@email.com"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
-            >
-              {isSignUp ? 'Registrati' : 'Accedi'}
-            </button>
-          </form>
-
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-dark-700"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-dark-800 text-gray-400">oppure</span>
-            </div>
-          </div>
 
           <button
             onClick={handleGoogleSignIn}
@@ -141,17 +78,6 @@ export default function ProfilePage() {
             </svg>
             <span>Continua con Google</span>
           </button>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-gray-400 hover:text-primary-500 transition-colors"
-            >
-              {isSignUp
-                ? 'Hai già un account? Accedi'
-                : 'Non hai un account? Registrati'}
-            </button>
-          </div>
         </div>
       </div>
     );

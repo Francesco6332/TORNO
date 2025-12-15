@@ -57,7 +57,7 @@ npm run dev
 ## 🔥 Configurazione Firebase
 
 1. Crea un nuovo progetto su [Firebase Console](https://console.firebase.google.com/)
-2. Abilita Authentication (Email/Password e Google)
+2. Abilita Authentication con Google come provider
 3. Crea un database Firestore
 4. Copia le credenziali nel file `.env`
 
