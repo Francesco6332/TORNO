@@ -11,23 +11,6 @@ export const DO_SPACES_CONFIG = {
   cdnEndpoint: import.meta.env.VITE_DO_SPACES_CDN_ENDPOINT || '',
 };
 
-// Debug: verifica la configurazione (solo in sviluppo)
-if (import.meta.env.DEV) {
-  const hasConfig = DO_SPACES_CONFIG.bucket || DO_SPACES_CONFIG.endpoint || DO_SPACES_CONFIG.cdnEndpoint;
-  if (!hasConfig) {
-    console.warn('⚠️ Digital Ocean Spaces non configurato');
-    console.warn('   Aggiungi nel file .env:');
-    console.warn('   VITE_DO_SPACES_BUCKET=torno');
-    console.warn('   VITE_DO_SPACES_REGION=nyc3 (o la tua regione)');
-    console.warn('   VITE_DO_SPACES_CDN_ENDPOINT=https://torno.nyc3.cdn.digitaloceanspaces.com (opzionale)');
-  } else {
-    console.log('✅ Digital Ocean Spaces configurato:', {
-      bucket: DO_SPACES_CONFIG.bucket || 'non configurato',
-      region: DO_SPACES_CONFIG.region,
-      cdn: DO_SPACES_CONFIG.cdnEndpoint ? 'abilitato' : 'disabilitato',
-    });
-  }
-}
 
 export const getImageUrl = (path: string): string => {
   // Se è già un URL completo, restituiscilo
@@ -55,8 +38,6 @@ export const getImageUrl = (path: string): string => {
   }
 
   // Fallback: restituisce il path originale (potrebbe non funzionare senza configurazione)
-  console.warn('⚠️ Digital Ocean Spaces non configurato. Le immagini potrebbero non caricarsi correttamente.');
-  console.warn('   Configura VITE_DO_SPACES_BUCKET e VITE_DO_SPACES_REGION nel file .env');
   return path;
 };
 

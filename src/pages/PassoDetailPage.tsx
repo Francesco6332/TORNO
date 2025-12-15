@@ -21,9 +21,6 @@ export default function PassoDetailPage() {
   const imageUrl = passo ? getPassoImageUrl(passo) : null;
 
   const handleImageError = () => {
-    if (passo) {
-      console.error(`❌ Errore caricamento immagine per ${passo.name}:`, imageUrl);
-    }
     setImageError(true);
   };
 

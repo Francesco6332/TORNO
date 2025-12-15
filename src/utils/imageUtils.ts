@@ -39,20 +39,12 @@ export const getPassoImageUrl = (passo: Passo): string | null => {
     }
     
     // Altrimenti costruisci l'URL con Digital Ocean Spaces
-    const fullUrl = getImageUrl(imagePath);
-    if (import.meta.env.DEV) {
-      console.log(`🖼️ Immagine per ${passo.name}:`, { imagePath, fullUrl });
-    }
-    return fullUrl;
+    return getImageUrl(imagePath);
   }
 
   // Genera automaticamente il path basandosi sul nome
   const autoPath = generatePassoImagePath(passo.name);
-  const fullUrl = getImageUrl(autoPath);
-  if (import.meta.env.DEV) {
-    console.log(`🖼️ Immagine auto-generata per ${passo.name}:`, { autoPath, fullUrl });
-  }
-  return fullUrl;
+  return getImageUrl(autoPath);
 };
 
 /**

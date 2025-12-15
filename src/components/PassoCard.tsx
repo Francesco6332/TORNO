@@ -20,7 +20,6 @@ export default function PassoCard({ passo }: PassoCardProps) {
   const imageUrl = getPassoImageUrl(passo);
 
   const handleImageError = () => {
-    console.error(`❌ Errore caricamento immagine per ${passo.name}:`, imageUrl);
     setImageError(true);
   };
 
