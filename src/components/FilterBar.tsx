@@ -54,10 +54,12 @@ export default function FilterBar({
                 className={clsx(
                   'px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
                   selectedDifficulty === level.value
-                    ? level.color === 'green' && 'bg-green-900/30 text-green-400 border border-green-700'
-                    : level.color === 'yellow' && 'bg-yellow-900/30 text-yellow-400 border border-yellow-700'
-                    : level.color === 'orange' && 'bg-orange-900/30 text-orange-400 border border-orange-700'
-                    : level.color === 'red' && 'bg-red-900/30 text-red-400 border border-red-700'
+                    ? {
+                        'bg-green-900/30 text-green-400 border border-green-700': level.color === 'green',
+                        'bg-yellow-900/30 text-yellow-400 border border-yellow-700': level.color === 'yellow',
+                        'bg-orange-900/30 text-orange-400 border border-orange-700': level.color === 'orange',
+                        'bg-red-900/30 text-red-400 border border-red-700': level.color === 'red',
+                      }
                     : 'bg-dark-700 text-gray-400 hover:bg-dark-600 border border-dark-600'
                 )}
               >
