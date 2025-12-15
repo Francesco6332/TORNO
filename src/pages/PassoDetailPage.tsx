@@ -20,7 +20,16 @@ export default function PassoDetailPage() {
 
   const imageUrl = passo ? getPassoImageUrl(passo) : null;
 
-  const handleImageError = () => {
+  // Debug temporaneo
+  if (import.meta.env.DEV && passo && imageUrl) {
+    console.log(`[PassoDetail] ${passo.name}:`, imageUrl);
+  }
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+    if (passo) {
+      console.error(`[PassoDetail] Errore caricamento immagine per ${passo.name}:`, target.src);
+    }
     setImageError(true);
   };
 
@@ -131,7 +140,7 @@ export default function PassoDetailPage() {
       </div>
 
       {/* Main Image */}
-      {imageUrl && !imageError && (
+      {imageUrl && imageUrl.length > 0 && !imageError && (
         <div className="mb-8 rounded-lg overflow-hidden">
           <img
             src={imageUrl}

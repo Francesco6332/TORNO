@@ -28,7 +28,7 @@ export const generatePassoImagePath = (passoName: string): string => {
  * Se il passo ha immagini esplicite, usa quelle
  * Altrimenti genera automaticamente il path basandosi sul nome
  */
-export const getPassoImageUrl = (passo: Passo): string | null => {
+export const getPassoImageUrl = (passo: Passo): string => {
   // Se ci sono immagini esplicite, usa la prima
   if (passo.images && passo.images.length > 0 && passo.images[0]) {
     const imagePath = passo.images[0];

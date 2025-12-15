@@ -19,7 +19,14 @@ export default function PassoCard({ passo }: PassoCardProps) {
   
   const imageUrl = getPassoImageUrl(passo);
 
-  const handleImageError = () => {
+  // Debug temporaneo
+  if (import.meta.env.DEV && imageUrl) {
+    console.log(`[PassoCard] ${passo.name}:`, imageUrl);
+  }
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+    console.error(`[PassoCard] Errore caricamento immagine per ${passo.name}:`, target.src);
     setImageError(true);
   };
 
@@ -41,20 +48,22 @@ export default function PassoCard({ passo }: PassoCardProps) {
       className="group block bg-dark-800 rounded-lg overflow-hidden border border-dark-700 hover:border-primary-600 transition-all duration-300 hover:shadow-lg hover:shadow-primary-900/20"
     >
       <div className="relative h-48 bg-gradient-to-br from-dark-700 to-dark-900 overflow-hidden">
-        {imageUrl && !imageError ? (
-          <img
-            src={imageUrl}
-            alt={passo.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-            onError={handleImageError}
-          />
+        {imageUrl && imageUrl.length > 0 && !imageError ? (
+          <>
+            <img
+              src={imageUrl}
+              alt={passo.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+              onError={handleImageError}
+            />
+            <div className="absolute inset-0 gradient-overlay pointer-events-none"></div>
+          </>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <MapPin className="w-16 h-16 text-dark-600" />
           </div>
         )}
-        <div className="absolute inset-0 gradient-overlay"></div>
         <button
           onClick={toggleFavorite}
           className={clsx(

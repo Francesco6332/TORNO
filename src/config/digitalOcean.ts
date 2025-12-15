@@ -37,7 +37,7 @@ export const getImageUrl = (path: string): string => {
     return `${DO_SPACES_CONFIG.endpoint}/${cleanPath}`;
   }
 
-  // Fallback: restituisce il path originale (potrebbe non funzionare senza configurazione)
-  return path;
+  // Se non c'è configurazione, restituisci stringa vuota per evitare di provare a caricare un path relativo
+  return '';
 };
 
