@@ -35,22 +35,22 @@ export const getImageUrl = (path: string): string => {
     return path;
   }
 
-  // Usa CDN se configurato
-  if (DO_SPACES_CONFIG.cdnEndpoint) {
-    // Rimuovi lo slash iniziale se presente per evitare doppi slash
-    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-    return `${DO_SPACES_CONFIG.cdnEndpoint}/${cleanPath}`;
+  // Rimuovi lo slash iniziale se presente
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+
+  // Usa endpoint diretto se bucket e region sono configurati (evita problemi CORB con CDN)
+  // Il CDN può avere problemi con file senza estensione
+  if (DO_SPACES_CONFIG.bucket && DO_SPACES_CONFIG.region) {
+    return `https://${DO_SPACES_CONFIG.bucket}.${DO_SPACES_CONFIG.region}.digitaloceanspaces.com/${cleanPath}`;
   }
 
-  // Usa endpoint diretto se bucket e region sono configurati
-  if (DO_SPACES_CONFIG.bucket && DO_SPACES_CONFIG.region) {
-    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-    return `https://${DO_SPACES_CONFIG.bucket}.${DO_SPACES_CONFIG.region}.digitaloceanspaces.com/${cleanPath}`;
+  // Usa CDN se configurato (solo se endpoint diretto non disponibile)
+  if (DO_SPACES_CONFIG.cdnEndpoint) {
+    return `${DO_SPACES_CONFIG.cdnEndpoint}/${cleanPath}`;
   }
 
   // Se endpoint è configurato direttamente
   if (DO_SPACES_CONFIG.endpoint) {
-    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
     return `${DO_SPACES_CONFIG.endpoint}/${cleanPath}`;
   }
 
