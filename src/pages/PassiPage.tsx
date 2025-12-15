@@ -83,8 +83,8 @@ export default function PassiPage() {
           </p>
         </div>
       ) : showMap ? (
-        <div className="h-[600px] mb-6">
-          <Map passi={filteredPassi} />
+        <div className="h-[600px] mb-6 w-full">
+          <Map passi={filteredPassi} className="w-full h-full" />
         </div>
       ) : (
         <>

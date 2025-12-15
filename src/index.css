@@ -40,6 +40,9 @@
 /* Leaflet map styles */
 .leaflet-container {
   background: #1a1a1a;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
 }
 
 .leaflet-popup-content-wrapper {
@@ -50,5 +53,10 @@
 
 .leaflet-popup-tip {
   background: #1f2937;
+}
+
+/* Fix per il rendering della mappa */
+.leaflet-container .leaflet-tile-container img {
+  max-width: none !important;
 }
 
