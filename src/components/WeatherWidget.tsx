@@ -1,6 +1,5 @@
 import { Cloud, Droplets, Wind, Eye } from 'lucide-react';
 import { useWeather } from '@/hooks/useWeather';
-import type { WeatherData } from '@/types';
 
 interface WeatherWidgetProps {
   lat: number;

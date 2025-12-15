@@ -9,10 +9,9 @@ import clsx from 'clsx';
 
 interface PassoCardProps {
   passo: Passo;
-  showWeather?: boolean;
 }
 
-export default function PassoCard({ passo, showWeather }: PassoCardProps) {
+export default function PassoCard({ passo }: PassoCardProps) {
   const [isFavorite, setIsFavorite] = useState(favoritesStorage.has(passo.id));
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
 

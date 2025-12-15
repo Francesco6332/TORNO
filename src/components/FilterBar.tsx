@@ -75,7 +75,7 @@ export default function FilterBar({
             Tipo Veicolo
           </label>
           <div className="flex flex-wrap gap-2">
-            {Object.entries(VEHICLE_TYPES).map(([key, value]) => (
+            {Object.entries(VEHICLE_TYPES).map(([, value]) => (
               <button
                 key={value}
                 onClick={() =>

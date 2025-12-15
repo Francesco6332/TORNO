@@ -1,4 +1,4 @@
-import { collection, getDocs, doc, getDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { CACHE_DURATION } from '@/config/constants';
 import { cacheManager } from '@/utils/cache';

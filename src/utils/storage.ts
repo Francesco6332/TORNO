@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from '@/config/constants';
-import type { Passo, UserPreferences } from '@/types';
+import type { UserPreferences } from '@/types';
 
 export const storage = {
   get<T>(key: string): T | null {

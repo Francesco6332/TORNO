@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Mail, LogIn, LogOut, Heart, Clock } from 'lucide-react';
+import { User, Mail, LogOut, Heart, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePassi } from '@/hooks/usePassi';
 import PassoCard from '@/components/PassoCard';

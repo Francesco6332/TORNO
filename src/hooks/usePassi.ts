@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { passiService } from '@/services/passiService';
-import type { Passo, DifficultyLevel, VehicleType } from '@/types';
+import type { DifficultyLevel, VehicleType } from '@/types';
 
 export const usePassi = () => {
   return useQuery({

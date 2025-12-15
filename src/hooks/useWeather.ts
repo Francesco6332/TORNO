@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { weatherService } from '@/services/weatherService';
-import type { WeatherData } from '@/types';
 
 export const useWeather = (lat: number, lng: number, enabled: boolean = true) => {
   return useQuery({
