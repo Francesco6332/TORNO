@@ -67,3 +67,18 @@ export interface Itinerary {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface NewItineraryInput {
+  title: string;
+  description: string;
+  region: string;
+  difficulty: DifficultyLevel;
+  vehicleType: VehicleType;
+  passi: Passo[];
+  totalLength: number;
+  totalElevationGain: number;
+  estimatedTime: number;
+  images?: string[];
+  tags?: string[];
+  createdBy: User;
+}
