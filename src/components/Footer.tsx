@@ -31,6 +31,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/itinerari" className="text-gray-500 hover:text-gray-200 transition-colors">
+                  {t('itinerari.title')}
+                </Link>
+              </li>
+              <li>
                 <Link to="/profile" className="text-gray-500 hover:text-gray-200 transition-colors">
                   {t('nav.profile')}
                 </Link>

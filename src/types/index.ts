@@ -50,3 +50,20 @@ export interface UserPreferences {
   theme?: 'light' | 'dark';
 }
 
+export interface Itinerary {
+  id: string;
+  title: string;
+  description: string;
+  region: string;
+  difficulty: DifficultyLevel;
+  vehicleType: VehicleType;
+  passi: Passo[];
+  totalLength: number; // km
+  totalElevationGain: number; // metri
+  estimatedTime: number; // ore
+  images?: string[];
+  tags?: string[];
+  createdBy: User;
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { Passo } from '@/types';
+import type { Passo, Itinerary } from '@/types';
 import { useTranslation } from '@/i18n/useTranslation';
 
-// Fix for default marker icons in React-Leaflet
 type LeafletDefaultIconPrototype = L.Icon.Default & { _getIconUrl?: unknown };
 
 delete (L.Icon.Default.prototype as LeafletDefaultIconPrototype)._getIconUrl;
@@ -15,67 +14,128 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
 
+const ROUTE_COLORS = [
+  '#f97316', '#3b82f6', '#22c55e', '#a855f7',
+  '#ef4444', '#eab308', '#06b6d4', '#ec4899',
+];
+
 interface MapProps {
-  passi: Passo[];
+  passi?: Passo[];
   selectedPasso?: Passo | null;
   center?: [number, number];
   zoom?: number;
   className?: string;
+  itineraries?: Itinerary[];
 }
 
 function MapUpdater({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap();
-  
   useEffect(() => {
     map.setView(center, zoom);
-    // Forza l'invalidazione delle dimensioni quando la mappa viene mostrata
-    setTimeout(() => {
-      map.invalidateSize();
-    }, 100);
+    setTimeout(() => map.invalidateSize(), 100);
   }, [map, center, zoom]);
-
   return null;
 }
 
-// Componente per invalidare le dimensioni quando la mappa diventa visibile
 function MapResizer() {
   const map = useMap();
-  
   useEffect(() => {
-    // Invalidazione iniziale
-    setTimeout(() => {
-      map.invalidateSize();
-    }, 100);
-    
-    // Invalidazione quando la finestra viene ridimensionata
-    const handleResize = () => {
-      map.invalidateSize();
-    };
-    
+    setTimeout(() => map.invalidateSize(), 100);
+    const handleResize = () => map.invalidateSize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [map]);
-
   return null;
 }
 
-export default function Map({ passi, selectedPasso, center, zoom = 6, className = '' }: MapProps) {
+function ItineraryRoute({ itinerary, color }: { itinerary: Itinerary; color: string }) {
+  const [routeCoords, setRouteCoords] = useState<[number, number][]>([]);
+
+  useEffect(() => {
+    if (itinerary.passi.length < 2) return;
+
+    const waypoints = itinerary.passi
+      .map(p => `${p.coordinates.lng},${p.coordinates.lat}`)
+      .join(';');
+
+    fetch(
+      `https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson`
+    )
+      .then(res => res.json())
+      .then(data => {
+        if (data.routes?.[0]?.geometry?.coordinates) {
+          const coords: [number, number][] = data.routes[0].geometry.coordinates.map(
+            ([lng, lat]: [number, number]) => [lat, lng]
+          );
+          setRouteCoords(coords);
+        }
+      })
+      .catch(() => {
+        // Fallback: straight lines between passi
+        setRouteCoords(
+          itinerary.passi.map(p => [p.coordinates.lat, p.coordinates.lng])
+        );
+      });
+  }, [itinerary]);
+
+  const markerIcon = (isFirst: boolean, isLast: boolean) =>
+    L.divIcon({
+      className: '',
+      html: `<div style="
+        width: 14px; height: 14px; border-radius: 50%;
+        background: ${isFirst || isLast ? color : '#fff'};
+        border: 3px solid ${color};
+        box-shadow: 0 0 0 2px rgba(0,0,0,0.3);
+      "></div>`,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+    });
+
+  return (
+    <>
+      {routeCoords.length > 1 && (
+        <Polyline
+          positions={routeCoords}
+          pathOptions={{ color, weight: 4, opacity: 0.85, lineCap: 'round', lineJoin: 'round' }}
+        />
+      )}
+      {itinerary.passi.map((passo, idx) => (
+        <Marker
+          key={passo.id}
+          position={[passo.coordinates.lat, passo.coordinates.lng]}
+          icon={markerIcon(idx === 0, idx === itinerary.passi.length - 1)}
+        >
+          <Popup>
+            <div className="text-dark-900">
+              <p className="text-xs font-semibold" style={{ color }}>{itinerary.title}</p>
+              <h3 className="font-semibold mb-1">{passo.name}</h3>
+              <p className="text-sm text-gray-600">{passo.region}</p>
+              <p className="text-sm text-gray-600">{passo.elevation} m</p>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+    </>
+  );
+}
+
+export default function Map({ passi = [], selectedPasso, center, zoom = 6, className = '', itineraries }: MapProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { t } = useTranslation();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  useEffect(() => { setIsMounted(true); }, []);
 
-  const defaultCenter: [number, number] = center || [41.9028, 12.4964]; // Rome, Italy
+  const allPassi = itineraries
+    ? itineraries.flatMap(i => i.passi)
+    : passi;
+
+  const defaultCenter: [number, number] = center || [41.9028, 12.4964];
 
   const getMapCenter = (): [number, number] => {
-    if (selectedPasso) {
-      return [selectedPasso.coordinates.lat, selectedPasso.coordinates.lng];
-    }
-    if (passi.length > 0) {
-      const avgLat = passi.reduce((sum, p) => sum + p.coordinates.lat, 0) / passi.length;
-      const avgLng = passi.reduce((sum, p) => sum + p.coordinates.lng, 0) / passi.length;
+    if (selectedPasso) return [selectedPasso.coordinates.lat, selectedPasso.coordinates.lng];
+    if (allPassi.length > 0) {
+      const avgLat = allPassi.reduce((sum, p) => sum + p.coordinates.lat, 0) / allPassi.length;
+      const avgLng = allPassi.reduce((sum, p) => sum + p.coordinates.lng, 0) / allPassi.length;
       return [avgLat, avgLng];
     }
     return defaultCenter;
@@ -83,11 +143,10 @@ export default function Map({ passi, selectedPasso, center, zoom = 6, className 
 
   const getMapZoom = (): number => {
     if (selectedPasso) return 12;
-    if (passi.length > 0) return 7;
+    if (allPassi.length > 0) return 7;
     return zoom;
   };
 
-  // Evita il rendering SSR per Leaflet
   if (!isMounted) {
     return (
       <div className={`rounded-lg overflow-hidden border border-dark-700 bg-dark-800 flex items-center justify-center ${className}`} style={{ height: '100%', minHeight: '400px' }}>
@@ -111,7 +170,18 @@ export default function Map({ passi, selectedPasso, center, zoom = 6, className 
         />
         <MapResizer />
         <MapUpdater center={getMapCenter()} zoom={getMapZoom()} />
-        {passi.map((passo) => (
+
+        {/* Itinerary mode: colored polylines + per-passo markers */}
+        {itineraries?.map((itinerary, idx) => (
+          <ItineraryRoute
+            key={itinerary.id}
+            itinerary={itinerary}
+            color={ROUTE_COLORS[idx % ROUTE_COLORS.length]}
+          />
+        ))}
+
+        {/* Passo mode: standard blue/red markers */}
+        {!itineraries && passi.map((passo) => (
           <Marker
             key={passo.id}
             position={[passo.coordinates.lat, passo.coordinates.lng]}

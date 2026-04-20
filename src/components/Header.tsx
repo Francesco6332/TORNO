@@ -12,6 +12,7 @@ export default function Header() {
   const { t } = useTranslation();
 
   const isActive = (path: string) => location.pathname === path;
+  const isItinerariActive = location.pathname.startsWith('/itinerari');
 
   return (
     <header className="glass-strong sticky top-0 z-50 border-b border-white/5">
@@ -47,6 +48,16 @@ export default function Header() {
               }`}
             >
               {t('nav.passi')}
+            </Link>
+            <Link
+              to="/itinerari"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                isItinerariActive
+                  ? 'text-primary-400 bg-white/10 border border-white/10'
+                  : 'text-gray-400 hover:text-gray-100 hover:bg-white/6'
+              }`}
+            >
+              {t('nav.itinerari')}
             </Link>
             {user && (
               <Link
@@ -118,6 +129,17 @@ export default function Header() {
                 }`}
               >
                 {t('nav.passi')}
+              </Link>
+              <Link
+                to="/itinerari"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  isItinerariActive
+                    ? 'text-primary-400 bg-white/10'
+                    : 'text-gray-400 hover:text-gray-100 hover:bg-white/5'
+                }`}
+              >
+                {t('nav.itinerari')}
               </Link>
               {user && (
                 <Link
