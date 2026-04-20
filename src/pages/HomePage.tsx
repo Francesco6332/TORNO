@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, MapPin, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, MapPin, TrendingUp, Users, ChevronDown } from 'lucide-react';
 import { usePassi } from '@/hooks/usePassi';
 import PassoCard from '@/components/PassoCard';
 import Map from '@/components/Map';
@@ -9,84 +9,136 @@ export default function HomePage() {
   const featuredPassi = passi.slice(0, 6);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Hero Section */}
-      <section className="text-center mb-12">
-        <h1 className="text-5xl md:text-7xl font-display text-white mb-4 tracking-wider">
-          TORNØ
+    <div>
+      {/* ── Hero ── */}
+      <section className="min-h-[92vh] flex flex-col items-center justify-center text-center px-4 relative overflow-hidden">
+        {/* Extra radial glow centered behind the title */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 55% 45% at 50% 52%, rgba(185,28,28,0.14) 0%, transparent 70%)',
+          }}
+          aria-hidden
+        />
+
+        {/* Badge */}
+        <div className="glass-red rounded-full px-4 py-1.5 inline-flex items-center gap-2 text-primary-300 text-sm font-medium mb-8 animate-fade-up relative z-10">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
+          La guida italiana ai passi di montagna
+        </div>
+
+        {/* Main title */}
+        <h1
+          className="font-display leading-none tracking-widest text-white text-glow-red select-none relative z-10 mb-4"
+          style={{ fontSize: 'clamp(5rem, 18vw, 16rem)' }}
+        >
+          TORN<span className="text-primary-500">Ø</span>
         </h1>
-        <p className="text-xl md:text-2xl text-gray-400 mb-8 max-w-2xl mx-auto">
-          Scopri i migliori passi di montagna per motociclisti e automobilisti
+
+        {/* Subtitle */}
+        <p className="text-lg md:text-xl text-gray-400 max-w-lg mb-10 relative z-10 leading-relaxed">
+          Scopri i migliori passi di montagna per motociclisti e automobilisti in Italia
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row gap-4 relative z-10">
           <Link
             to="/passi"
-            className="inline-flex items-center space-x-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+            className="btn-primary inline-flex items-center gap-2 px-8 py-3.5 text-white rounded-xl font-medium text-sm"
           >
-            <span>Esplora i Passi</span>
-            <ArrowRight className="w-5 h-5" />
+            Esplora i Passi
+            <ArrowRight className="w-4 h-4" />
           </Link>
+          <a
+            href="#stats"
+            className="btn-secondary inline-flex items-center gap-2 px-8 py-3.5 text-gray-300 rounded-xl font-medium text-sm"
+          >
+            Scopri di più
+            <ChevronDown className="w-4 h-4" />
+          </a>
+        </div>
+
+        {/* Scroll cue */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-600 animate-bounce z-10" aria-hidden>
+          <ChevronDown className="w-5 h-5" />
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="bg-dark-800 rounded-lg p-6 border border-dark-700">
-          <div className="flex items-center space-x-3 mb-2">
-            <MapPin className="w-8 h-8 text-primary-500" />
-            <h3 className="text-2xl font-display text-white">{passi.length}</h3>
+      {/* ── Stats ── */}
+      <section id="stats" className="container mx-auto px-4 pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="glass-card rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="glass-red p-2.5 rounded-xl">
+                <MapPin className="w-5 h-5 text-primary-400" />
+              </div>
+              <span className="text-3xl font-display text-white">{passi.length}</span>
+            </div>
+            <p className="text-gray-400 text-sm">Passi Disponibili</p>
           </div>
-          <p className="text-gray-400">Passi Disponibili</p>
-        </div>
-        <div className="bg-dark-800 rounded-lg p-6 border border-dark-700">
-          <div className="flex items-center space-x-3 mb-2">
-            <TrendingUp className="w-8 h-8 text-primary-500" />
-            <h3 className="text-2xl font-display text-white">
-              {Math.max(...passi.map(p => p.elevation), 0).toLocaleString()}m
-            </h3>
+
+          <div className="glass-card rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="glass-red p-2.5 rounded-xl">
+                <TrendingUp className="w-5 h-5 text-primary-400" />
+              </div>
+              <span className="text-3xl font-display text-white">
+                {Math.max(...passi.map(p => p.elevation), 0).toLocaleString()}m
+              </span>
+            </div>
+            <p className="text-gray-400 text-sm">Quota Massima</p>
           </div>
-          <p className="text-gray-400">Quota Massima</p>
-        </div>
-        <div className="bg-dark-800 rounded-lg p-6 border border-dark-700">
-          <div className="flex items-center space-x-3 mb-2">
-            <Users className="w-8 h-8 text-primary-500" />
-            <h3 className="text-2xl font-display text-white">2</h3>
+
+          <div className="glass-card rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="glass-red p-2.5 rounded-xl">
+                <Users className="w-5 h-5 text-primary-400" />
+              </div>
+              <span className="text-3xl font-display text-white">2</span>
+            </div>
+            <p className="text-gray-400 text-sm">Tipi di Veicoli</p>
           </div>
-          <p className="text-gray-400">Tipi di Veicoli</p>
         </div>
       </section>
 
-      {/* Map Section */}
+      {/* ── Interactive Map ── */}
       {passi.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-3xl font-display text-white mb-6">Mappa Interattiva</h2>
-          <div className="h-96 rounded-lg overflow-hidden">
-            <Map passi={passi} />
+        <section className="container mx-auto px-4 pb-20">
+          <h2 className="text-3xl md:text-4xl font-display text-white mb-6">
+            Mappa Interattiva
+          </h2>
+          <div className="glass-card rounded-2xl p-1.5">
+            <div className="h-96 rounded-xl overflow-hidden">
+              <Map passi={passi} />
+            </div>
           </div>
         </section>
       )}
 
-      {/* Featured Passi */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-display text-white">Passi in Evidenza</h2>
+      {/* ── Featured Passes ── */}
+      <section className="container mx-auto px-4 pb-20">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl md:text-4xl font-display text-white">
+            Passi in Evidenza
+          </h2>
           <Link
             to="/passi"
-            className="text-primary-500 hover:text-primary-400 transition-colors flex items-center space-x-1"
+            className="btn-secondary inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm text-gray-300"
           >
-            <span>Vedi tutti</span>
-            <ArrowRight className="w-4 h-4" />
+            Vedi tutti
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-dark-800 rounded-lg h-64 animate-pulse" />
+              <div key={i} className="glass-card rounded-2xl h-72 animate-pulse" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {featuredPassi.map((passo) => (
               <PassoCard key={passo.id} passo={passo} />
             ))}
@@ -96,4 +148,3 @@ export default function HomePage() {
     </div>
   );
 }
-

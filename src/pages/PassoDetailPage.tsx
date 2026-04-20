@@ -26,7 +26,6 @@ export default function PassoDetailPage() {
       setImageIndex((current) => current + 1);
       return;
     }
-
     setImageError(true);
   };
 
@@ -34,14 +33,13 @@ export default function PassoDetailPage() {
     if (passo) {
       setIsFavorite(favoritesStorage.has(passo.id));
       recentViewsStorage.add(passo.id);
-      setImageError(false); // Reset error quando cambia passo
+      setImageError(false);
       setImageIndex(0);
     }
   }, [passo]);
 
   const toggleFavorite = () => {
     if (!passo) return;
-    
     if (isFavorite) {
       favoritesStorage.remove(passo.id);
     } else {
@@ -52,51 +50,47 @@ export default function PassoDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-10">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-dark-800 rounded w-1/3"></div>
-          <div className="h-64 bg-dark-800 rounded"></div>
-          <div className="h-32 bg-dark-800 rounded"></div>
+          <div className="h-8 glass-card rounded-xl w-1/4" />
+          <div className="h-72 glass-card rounded-2xl" />
+          <div className="h-40 glass-card rounded-2xl" />
         </div>
       </div>
     );
   }
 
-  if (error || !passo) {
-    return <Navigate to="/passi" replace />;
-  }
+  if (error || !passo) return <Navigate to="/passi" replace />;
 
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Back Button */}
+    <div className="container mx-auto px-4 py-10">
+      {/* Back */}
       <Link
         to="/passi"
-        className="inline-flex items-center space-x-2 text-gray-400 hover:text-primary-500 transition-colors mb-6"
+        className="inline-flex items-center gap-2 text-gray-500 hover:text-primary-400 transition-colors mb-8 text-sm"
       >
-        <ArrowLeft className="w-5 h-5" />
-        <span>Torna ai passi</span>
+        <ArrowLeft className="w-4 h-4" />
+        Torna ai passi
       </Link>
 
-      {/* Header */}
+      {/* Page header */}
       <div className="mb-8">
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-4xl md:text-5xl font-display text-white mb-2">
+            <h1 className="text-5xl md:text-6xl font-display text-white mb-2">
               {passo.name}
             </h1>
-            <div className="flex items-center space-x-4 text-gray-400">
-              <div className="flex items-center space-x-1">
+            <div className="flex items-center flex-wrap gap-4 text-gray-400 text-sm">
+              <div className="flex items-center gap-1.5">
                 <MapPin className="w-4 h-4" />
                 <span>{passo.region}</span>
               </div>
               {passo.updatedAt && (
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
-                  <span>
-                    Aggiornato {format(passo.updatedAt, 'd MMMM yyyy', { locale: it })}
-                  </span>
+                  <span>Aggiornato {format(passo.updatedAt, 'd MMMM yyyy', { locale: it })}</span>
                 </div>
               )}
             </div>
@@ -104,94 +98,92 @@ export default function PassoDetailPage() {
           <button
             onClick={toggleFavorite}
             className={clsx(
-              'p-3 rounded-lg transition-colors',
+              'p-3 rounded-xl transition-all duration-200 flex-shrink-0',
               isFavorite
-                ? 'bg-primary-600 text-white'
-                : 'bg-dark-800 text-gray-400 hover:text-primary-500 border border-dark-700'
+                ? 'btn-primary text-white'
+                : 'btn-secondary text-gray-400 hover:text-primary-400'
             )}
           >
-            <Heart className={clsx('w-6 h-6', isFavorite && 'fill-current')} />
+            <Heart className={clsx('w-5 h-5', isFavorite && 'fill-current')} />
           </button>
         </div>
 
-        {/* Difficulty Badge */}
-        <div className="flex items-center space-x-2">
+        {/* Badges */}
+        <div className="flex items-center gap-2 flex-wrap">
           <span className={clsx(
-            'px-3 py-1 rounded-md text-sm font-semibold',
-            difficulty.color === 'green' && 'bg-green-900/30 text-green-400',
-            difficulty.color === 'yellow' && 'bg-yellow-900/30 text-yellow-400',
-            difficulty.color === 'orange' && 'bg-orange-900/30 text-orange-400',
-            difficulty.color === 'red' && 'bg-red-900/30 text-red-400',
+            'px-3 py-1 rounded-full text-sm font-semibold',
+            difficulty.color === 'green' && 'bg-green-500/15 text-green-400 border border-green-500/20',
+            difficulty.color === 'yellow' && 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/20',
+            difficulty.color === 'orange' && 'bg-orange-500/15 text-orange-400 border border-orange-500/20',
+            difficulty.color === 'red' && 'bg-red-500/15 text-red-400 border border-red-500/20',
           )}>
             {difficulty.icon} {difficulty.label}
           </span>
-          <span className="px-3 py-1 rounded-md text-sm font-medium bg-dark-800 text-gray-400 border border-dark-700">
+          <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/6 text-gray-400 border border-white/8">
             {passo.vehicleType === 'both' ? 'Moto/Auto' : passo.vehicleType === 'motorcycle' ? 'Moto' : 'Auto'}
           </span>
         </div>
       </div>
 
-      {/* Main Image */}
+      {/* Hero image */}
       {imageUrl && imageUrl.length > 0 && !imageError && (
-        <div className="mb-8 rounded-lg overflow-hidden">
+        <div className="mb-10 rounded-2xl overflow-hidden glass-card p-1">
           <img
             src={imageUrl}
             alt={passo.name}
-            className="w-full h-64 md:h-96 object-cover"
+            className="w-full h-64 md:h-[28rem] object-cover rounded-xl"
             loading="lazy"
             onError={handleImageError}
           />
         </div>
       )}
 
-      {/* Content Grid */}
+      {/* Content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
+        {/* Main */}
         <div className="lg:col-span-2 space-y-8">
           {/* Description */}
-          <section>
+          <section className="glass-card rounded-2xl p-6">
             <h2 className="text-2xl font-display text-white mb-4">Descrizione</h2>
             <p className="text-gray-300 leading-relaxed">{passo.description}</p>
           </section>
 
           {/* Stats */}
-          <section className="bg-dark-800 rounded-lg p-6 border border-dark-700">
-            <h2 className="text-2xl font-display text-white mb-4">Informazioni</h2>
+          <section className="glass-card rounded-2xl p-6">
+            <h2 className="text-2xl font-display text-white mb-6">Informazioni</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               <div>
-                <div className="flex items-center space-x-2 text-gray-400 mb-1">
-                  <TrendingUp className="w-5 h-5 text-primary-500" />
-                  <span className="text-sm">Quota</span>
+                <div className="flex items-center gap-2 text-gray-500 mb-1.5 text-xs uppercase tracking-wider">
+                  <TrendingUp className="w-4 h-4 text-primary-500/60" />
+                  Quota
                 </div>
-                <p className="text-xl font-semibold text-white">
-                  {passo.elevation.toLocaleString()} m
-                </p>
+                <p className="text-2xl font-display text-white">{passo.elevation.toLocaleString()} m</p>
               </div>
               {passo.length && (
                 <div>
-                  <div className="flex items-center space-x-2 text-gray-400 mb-1">
-                    <Gauge className="w-5 h-5 text-primary-500" />
-                    <span className="text-sm">Lunghezza</span>
+                  <div className="flex items-center gap-2 text-gray-500 mb-1.5 text-xs uppercase tracking-wider">
+                    <Gauge className="w-4 h-4 text-primary-500/60" />
+                    Lunghezza
                   </div>
-                  <p className="text-xl font-semibold text-white">{passo.length} km</p>
+                  <p className="text-2xl font-display text-white">{passo.length} km</p>
                 </div>
               )}
               {passo.maxGradient && (
                 <div>
-                  <div className="flex items-center space-x-2 text-gray-400 mb-1">
-                    <TrendingUp className="w-5 h-5 text-primary-500" />
-                    <span className="text-sm">Pendenza Max</span>
+                  <div className="flex items-center gap-2 text-gray-500 mb-1.5 text-xs uppercase tracking-wider">
+                    <TrendingUp className="w-4 h-4 text-primary-500/60" />
+                    Pendenza Max
                   </div>
-                  <p className="text-xl font-semibold text-white">{passo.maxGradient}%</p>
+                  <p className="text-2xl font-display text-white">{passo.maxGradient}%</p>
                 </div>
               )}
               {passo.surface && (
                 <div>
-                  <div className="flex items-center space-x-2 text-gray-400 mb-1">
-                    <MapPin className="w-5 h-5 text-primary-500" />
-                    <span className="text-sm">Superficie</span>
+                  <div className="flex items-center gap-2 text-gray-500 mb-1.5 text-xs uppercase tracking-wider">
+                    <MapPin className="w-4 h-4 text-primary-500/60" />
+                    Superficie
                   </div>
-                  <p className="text-xl font-semibold text-white capitalize">{passo.surface}</p>
+                  <p className="text-2xl font-display text-white capitalize">{passo.surface}</p>
                 </div>
               )}
             </div>
@@ -200,8 +192,10 @@ export default function PassoDetailPage() {
           {/* Map */}
           <section>
             <h2 className="text-2xl font-display text-white mb-4">Posizione</h2>
-            <div className="h-96">
-              <Map passi={[passo]} selectedPasso={passo} />
+            <div className="glass-card rounded-2xl p-1.5">
+              <div className="h-80 rounded-xl overflow-hidden">
+                <Map passi={[passo]} selectedPasso={passo} />
+              </div>
             </div>
           </section>
 
@@ -213,7 +207,7 @@ export default function PassoDetailPage() {
                 {passo.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 bg-dark-800 text-gray-400 rounded-md text-sm border border-dark-700"
+                    className="px-3 py-1 glass rounded-full text-gray-400 text-sm"
                   >
                     #{tag}
                   </span>

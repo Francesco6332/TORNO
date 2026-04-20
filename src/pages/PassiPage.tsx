@@ -4,6 +4,7 @@ import PassoCard from '@/components/PassoCard';
 import FilterBar from '@/components/FilterBar';
 import SearchBar from '@/components/SearchBar';
 import Map from '@/components/Map';
+import { Map as MapIcon, List } from 'lucide-react';
 import type { DifficultyLevel, VehicleType } from '@/types';
 
 export default function PassiPage() {
@@ -17,15 +18,8 @@ export default function PassiPage() {
 
   const filteredPassi = useMemo(() => {
     let passi = searchQuery.length > 2 ? searchResults : allPassi;
-
-    if (selectedDifficulty) {
-      passi = passi.filter(p => p.difficulty === selectedDifficulty);
-    }
-
-    if (selectedVehicleType) {
-      passi = passi.filter(p => p.vehicleType === selectedVehicleType || p.vehicleType === 'both');
-    }
-
+    if (selectedDifficulty) passi = passi.filter(p => p.difficulty === selectedDifficulty);
+    if (selectedVehicleType) passi = passi.filter(p => p.vehicleType === selectedVehicleType || p.vehicleType === 'both');
     return passi;
   }, [allPassi, searchResults, searchQuery, selectedDifficulty, selectedVehicleType]);
 
@@ -36,9 +30,10 @@ export default function PassiPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-display text-white mb-4">
+    <div className="container mx-auto px-4 py-10">
+      {/* Page header */}
+      <div className="mb-10">
+        <h1 className="text-5xl md:text-6xl font-display text-white mb-3">
           Passi di Montagna
         </h1>
         <p className="text-gray-400">
@@ -46,8 +41,8 @@ export default function PassiPage() {
         </p>
       </div>
 
-      {/* Search and Filters */}
-      <div className="mb-6 space-y-4">
+      {/* Search + Filters — glass panel */}
+      <div className="glass-card rounded-2xl p-5 mb-8 space-y-4">
         <SearchBar onSearch={setSearchQuery} />
         <FilterBar
           selectedDifficulty={selectedDifficulty}
@@ -58,47 +53,50 @@ export default function PassiPage() {
         />
       </div>
 
-      {/* Toggle Map View */}
-      <div className="mb-6 flex justify-end">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between mb-6">
+        <span className="text-sm text-gray-500">
+          {filteredPassi.length} {filteredPassi.length === 1 ? 'passo' : 'passi'} trovati
+        </span>
         <button
           onClick={() => setShowMap(!showMap)}
-          className="px-4 py-2 bg-dark-800 hover:bg-dark-700 text-white rounded-lg border border-dark-700 transition-colors text-sm font-medium"
+          className="btn-secondary inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-300"
         >
-          {showMap ? 'Mostra Lista' : 'Mostra Mappa'}
+          {showMap ? (
+            <><List className="w-4 h-4" /> Lista</>
+          ) : (
+            <><MapIcon className="w-4 h-4" /> Mappa</>
+          )}
         </button>
       </div>
 
       {/* Results */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-dark-800 rounded-lg h-64 animate-pulse" />
+            <div key={i} className="glass-card rounded-2xl h-72 animate-pulse" />
           ))}
         </div>
       ) : filteredPassi.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-400 text-lg mb-2">Nessun passo trovato</p>
+        <div className="glass-card rounded-2xl p-16 text-center">
+          <p className="text-gray-300 text-lg mb-2">Nessun passo trovato</p>
           <p className="text-gray-500 text-sm">
             Prova a modificare i filtri o la ricerca
           </p>
         </div>
       ) : showMap ? (
-        <div className="h-[600px] mb-6 w-full">
-          <Map passi={filteredPassi} className="w-full h-full" />
+        <div className="glass-card rounded-2xl p-1.5">
+          <div className="h-[600px] rounded-xl overflow-hidden w-full">
+            <Map passi={filteredPassi} className="w-full h-full" />
+          </div>
         </div>
       ) : (
-        <>
-          <div className="mb-4 text-sm text-gray-400">
-            Trovati {filteredPassi.length} passi
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPassi.map((passo) => (
-              <PassoCard key={passo.id} passo={passo} />
-            ))}
-          </div>
-        </>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredPassi.map((passo) => (
+            <PassoCard key={passo.id} passo={passo} />
+          ))}
+        </div>
       )}
     </div>
   );
 }
-

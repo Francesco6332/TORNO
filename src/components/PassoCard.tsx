@@ -17,7 +17,7 @@ export default function PassoCard({ passo }: PassoCardProps) {
   const [imageError, setImageError] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
-  
+
   const imageUrls = getPassoImageUrlCandidates(passo);
   const imageUrl = imageUrls[imageIndex];
 
@@ -26,14 +26,12 @@ export default function PassoCard({ passo }: PassoCardProps) {
       setImageIndex((current) => current + 1);
       return;
     }
-
     setImageError(true);
   };
 
   const toggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
     if (isFavorite) {
       favoritesStorage.remove(passo.id);
     } else {
@@ -45,80 +43,86 @@ export default function PassoCard({ passo }: PassoCardProps) {
   return (
     <Link
       to={`/passi/${passo.id}`}
-      className="group block bg-dark-800 rounded-lg overflow-hidden border border-dark-700 hover:border-primary-600 transition-all duration-300 hover:shadow-lg hover:shadow-primary-900/20"
+      className="group block glass-card rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5"
     >
-      <div className="relative h-48 bg-gradient-to-br from-dark-700 to-dark-900 overflow-hidden">
+      {/* Image */}
+      <div className="relative h-48 bg-gradient-to-br from-dark-800 to-dark-950 overflow-hidden">
         {imageUrl && imageUrl.length > 0 && !imageError ? (
           <>
             <img
               src={imageUrl}
               alt={passo.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
               onError={handleImageError}
             />
-            <div className="absolute inset-0 gradient-overlay pointer-events-none"></div>
+            <div className="absolute inset-0 gradient-overlay pointer-events-none" />
           </>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <MapPin className="w-16 h-16 text-dark-600" />
+            <MapPin className="w-14 h-14 text-white/10" />
           </div>
         )}
+
+        {/* Favorite button */}
         <button
           onClick={toggleFavorite}
           className={clsx(
-            "absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm transition-colors",
+            'absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all duration-200',
             isFavorite
-              ? "bg-primary-600 text-white"
-              : "bg-dark-900/50 text-gray-400 hover:text-primary-500"
+              ? 'bg-primary-600/90 text-white shadow-lg shadow-primary-900/40'
+              : 'bg-black/40 text-gray-300 hover:text-primary-400 hover:bg-black/60 border border-white/10'
           )}
         >
-          <Heart className={clsx("w-5 h-5", isFavorite && "fill-current")} />
+          <Heart className={clsx('w-4 h-4', isFavorite && 'fill-current')} />
         </button>
-        <div className="absolute bottom-3 left-3 right-3">
-          <h3 className="text-xl font-display text-white text-shadow mb-1">
+
+        {/* Name overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h3 className="text-xl font-display text-white text-shadow mb-0.5">
             {passo.name}
           </h3>
-          <div className="flex items-center space-x-2 text-sm text-gray-200">
-            <MapPin className="w-4 h-4" />
+          <div className="flex items-center gap-1.5 text-xs text-gray-300/80">
+            <MapPin className="w-3 h-3" />
             <span>{passo.region}</span>
           </div>
         </div>
       </div>
 
-      <div className="p-4">
+      {/* Details */}
+      <div className="p-4 bg-black/20">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className={clsx(
-              "px-2 py-1 rounded text-xs font-semibold",
-              difficulty.color === 'green' && "bg-green-900/30 text-green-400",
-              difficulty.color === 'yellow' && "bg-yellow-900/30 text-yellow-400",
-              difficulty.color === 'orange' && "bg-orange-900/30 text-orange-400",
-              difficulty.color === 'red' && "bg-red-900/30 text-red-400",
+              'px-2.5 py-0.5 rounded-full text-xs font-semibold',
+              difficulty.color === 'green' && 'bg-green-500/15 text-green-400 border border-green-500/20',
+              difficulty.color === 'yellow' && 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/20',
+              difficulty.color === 'orange' && 'bg-orange-500/15 text-orange-400 border border-orange-500/20',
+              difficulty.color === 'red' && 'bg-red-500/15 text-red-400 border border-red-500/20',
             )}>
               {difficulty.icon} {difficulty.label}
             </span>
-            <span className="px-2 py-1 rounded text-xs font-medium bg-dark-700 text-gray-400">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/6 text-gray-400 border border-white/8">
               {passo.vehicleType === 'both' ? 'Moto/Auto' : passo.vehicleType === 'motorcycle' ? 'Moto' : 'Auto'}
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="flex items-center space-x-2 text-gray-400">
-            <TrendingUp className="w-4 h-4 text-primary-500" />
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="flex items-center gap-1.5 text-gray-400">
+            <TrendingUp className="w-3.5 h-3.5 text-primary-500/70" />
             <span>{passo.elevation.toLocaleString()} m</span>
           </div>
           {passo.length && (
-            <div className="flex items-center space-x-2 text-gray-400">
-              <Gauge className="w-4 h-4 text-primary-500" />
+            <div className="flex items-center gap-1.5 text-gray-400">
+              <Gauge className="w-3.5 h-3.5 text-primary-500/70" />
               <span>{passo.length} km</span>
             </div>
           )}
         </div>
 
         {passo.description && (
-          <p className="mt-3 text-sm text-gray-400 line-clamp-2">
+          <p className="mt-3 text-xs text-gray-500 line-clamp-2 leading-relaxed">
             {passo.description}
           </p>
         )}

@@ -28,10 +28,10 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-10">
         <div className="animate-pulse space-y-6">
-          <div className="h-32 bg-dark-800 rounded"></div>
-          <div className="h-64 bg-dark-800 rounded"></div>
+          <div className="h-36 glass-card rounded-2xl" />
+          <div className="h-72 glass-card rounded-2xl" />
         </div>
       </div>
     );
@@ -39,44 +39,35 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-md">
-        <div className="bg-dark-800 rounded-lg p-8 border border-dark-700">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-display text-white mb-2">Accedi</h1>
-            <p className="text-gray-400">
-              Accedi
-            </p>
+      <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-[70vh]">
+        <div className="glass-card rounded-2xl p-10 w-full max-w-sm text-center">
+          {/* Icon */}
+          <div className="w-16 h-16 glass-red rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <User className="w-8 h-8 text-primary-400" />
           </div>
 
+          <h1 className="text-4xl font-display text-white mb-2">Accedi</h1>
+          <p className="text-gray-400 text-sm mb-8">
+            Accedi per salvare i tuoi passi preferiti e tenere traccia delle visualizzazioni recenti.
+          </p>
+
           {error && (
-            <div className="mb-4 p-3 bg-red-900/30 border border-red-700 text-red-400 rounded-md text-sm">
+            <div className="mb-6 p-3 glass-red rounded-xl text-red-400 text-sm">
               {error}
             </div>
           )}
 
           <button
             onClick={handleGoogleSignIn}
-            className="w-full px-4 py-3 bg-dark-900 hover:bg-dark-800 text-white rounded-lg font-medium transition-colors border border-dark-700 flex items-center justify-center space-x-2"
+            className="btn-secondary w-full flex items-center justify-center gap-3 px-5 py-3.5 text-white rounded-xl font-medium text-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="currentColor"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            <span>Continua con Google</span>
+            Continua con Google
           </button>
         </div>
       </div>
@@ -84,58 +75,61 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* User Info */}
-      <div className="bg-dark-800 rounded-lg p-6 border border-dark-700 mb-8">
-        <div className="flex items-center space-x-4 mb-4">
+    <div className="container mx-auto px-4 py-10">
+      {/* User card */}
+      <div className="glass-card rounded-2xl p-6 mb-10">
+        <div className="flex items-center gap-4 mb-5">
           {user.photoURL ? (
             <img
               src={user.photoURL}
               alt={user.displayName || 'User'}
-              className="w-16 h-16 rounded-full"
+              className="w-16 h-16 rounded-2xl ring-2 ring-white/10"
             />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-dark-700 flex items-center justify-center">
-              <User className="w-8 h-8 text-gray-400" />
+            <div className="w-16 h-16 rounded-2xl glass-red flex items-center justify-center">
+              <User className="w-8 h-8 text-primary-400" />
             </div>
           )}
           <div>
-            <h1 className="text-2xl font-display text-white">
+            <h1 className="text-3xl font-display text-white">
               {user.displayName || 'Utente'}
             </h1>
-            <div className="flex items-center space-x-2 text-gray-400">
-              <Mail className="w-4 h-4" />
+            <div className="flex items-center gap-1.5 text-gray-400 text-sm mt-0.5">
+              <Mail className="w-3.5 h-3.5" />
               <span>{user.email}</span>
             </div>
           </div>
         </div>
         <button
           onClick={logout}
-          className="inline-flex items-center space-x-2 px-4 py-2 bg-dark-900 hover:bg-dark-700 text-gray-300 rounded-lg transition-colors border border-dark-700"
+          className="btn-secondary inline-flex items-center gap-2 px-4 py-2 text-gray-300 rounded-xl text-sm font-medium"
         >
           <LogOut className="w-4 h-4" />
-          <span>Esci</span>
+          Esci
         </button>
       </div>
 
       {/* Favorites */}
-      <section className="mb-8">
-        <div className="flex items-center space-x-2 mb-6">
-          <Heart className="w-6 h-6 text-primary-500" />
+      <section className="mb-12">
+        <div className="flex items-center gap-2 mb-6">
+          <Heart className="w-5 h-5 text-primary-500" />
           <h2 className="text-3xl font-display text-white">Preferiti</h2>
+          {favorites.length > 0 && (
+            <span className="glass-red text-primary-400 text-xs font-semibold px-2 py-0.5 rounded-full ml-1">
+              {favorites.length}
+            </span>
+          )}
         </div>
         {favorites.length === 0 ? (
-          <div className="bg-dark-800 rounded-lg p-8 border border-dark-700 text-center">
-            <p className="text-gray-400 mb-4">Nessun passo nei preferiti</p>
-            <Link
-              to="/passi"
-              className="text-primary-500 hover:text-primary-400 transition-colors"
-            >
-              Esplora i passi
+          <div className="glass-card rounded-2xl p-10 text-center">
+            <Heart className="w-10 h-10 text-white/10 mx-auto mb-4" />
+            <p className="text-gray-400 mb-3">Nessun passo nei preferiti</p>
+            <Link to="/passi" className="text-primary-400 hover:text-primary-300 transition-colors text-sm">
+              Esplora i passi →
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {favorites.map((passo) => (
               <PassoCard key={passo.id} passo={passo} />
             ))}
@@ -145,16 +139,22 @@ export default function ProfilePage() {
 
       {/* Recent Views */}
       <section>
-        <div className="flex items-center space-x-2 mb-6">
-          <Clock className="w-6 h-6 text-primary-500" />
+        <div className="flex items-center gap-2 mb-6">
+          <Clock className="w-5 h-5 text-primary-500" />
           <h2 className="text-3xl font-display text-white">Visualizzati di Recente</h2>
+          {recent.length > 0 && (
+            <span className="glass-red text-primary-400 text-xs font-semibold px-2 py-0.5 rounded-full ml-1">
+              {recent.length}
+            </span>
+          )}
         </div>
         {recent.length === 0 ? (
-          <div className="bg-dark-800 rounded-lg p-8 border border-dark-700 text-center">
+          <div className="glass-card rounded-2xl p-10 text-center">
+            <Clock className="w-10 h-10 text-white/10 mx-auto mb-4" />
             <p className="text-gray-400">Nessun passo visualizzato di recente</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {recent.map((passo) => (
               <PassoCard key={passo.id} passo={passo} />
             ))}
@@ -164,4 +164,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

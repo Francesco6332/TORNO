@@ -11,36 +11,36 @@ export default function Header() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="bg-dark-900 border-b border-dark-800 sticky top-0 z-50 backdrop-blur-sm bg-opacity-95">
+    <header className="glass-strong sticky top-0 z-50 border-b border-white/5">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-primary-600 blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
-              <h1 className="text-3xl font-display text-primary-500 relative z-10 tracking-wider">
+              <div className="absolute inset-0 bg-primary-600 blur-xl opacity-40 group-hover:opacity-65 transition-opacity rounded-full" />
+              <h1 className="text-3xl font-display text-primary-400 relative z-10 tracking-wider group-hover:text-primary-300 transition-colors">
                 TORNØ
               </h1>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden md:flex items-center space-x-1">
             <Link
               to="/"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive('/')
-                  ? 'text-primary-500 bg-dark-800'
-                  : 'text-gray-300 hover:text-primary-500 hover:bg-dark-800'
+                  ? 'text-primary-400 bg-white/10 border border-white/10'
+                  : 'text-gray-400 hover:text-gray-100 hover:bg-white/6'
               }`}
             >
               Home
             </Link>
             <Link
               to="/passi"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive('/passi')
-                  ? 'text-primary-500 bg-dark-800'
-                  : 'text-gray-300 hover:text-primary-500 hover:bg-dark-800'
+                  ? 'text-primary-400 bg-white/10 border border-white/10'
+                  : 'text-gray-400 hover:text-gray-100 hover:bg-white/6'
               }`}
             >
               Passi
@@ -48,10 +48,10 @@ export default function Header() {
             {user && (
               <Link
                 to="/profile"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive('/profile')
-                    ? 'text-primary-500 bg-dark-800'
-                    : 'text-gray-300 hover:text-primary-500 hover:bg-dark-800'
+                    ? 'text-primary-400 bg-white/10 border border-white/10'
+                    : 'text-gray-400 hover:text-gray-100 hover:bg-white/6'
                 }`}
               >
                 Profilo
@@ -60,11 +60,11 @@ export default function Header() {
           </nav>
 
           {/* Auth Section */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
             {user ? (
               <button
                 onClick={logout}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-primary-500 transition-colors"
+                className="btn-secondary flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-300 rounded-lg"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Esci</span>
@@ -72,7 +72,7 @@ export default function Header() {
             ) : (
               <Link
                 to="/profile"
-                className="flex items-center space-x-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md text-sm font-medium transition-colors"
+                className="btn-primary flex items-center space-x-2 px-4 py-2 text-white rounded-lg text-sm font-medium"
               >
                 <User className="w-4 h-4" />
                 <span>Accedi</span>
@@ -83,23 +83,23 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-gray-300 hover:text-primary-500 transition-colors"
+            className="md:hidden btn-secondary p-2 rounded-lg text-gray-300 hover:text-white transition-colors"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-dark-800">
-            <nav className="flex flex-col space-y-2">
+          <div className="md:hidden py-4 border-t border-white/5">
+            <nav className="flex flex-col space-y-1">
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive('/')
-                    ? 'text-primary-500 bg-dark-800'
-                    : 'text-gray-300 hover:text-primary-500'
+                    ? 'text-primary-400 bg-white/10'
+                    : 'text-gray-400 hover:text-gray-100 hover:bg-white/5'
                 }`}
               >
                 Home
@@ -107,10 +107,10 @@ export default function Header() {
               <Link
                 to="/passi"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive('/passi')
-                    ? 'text-primary-500 bg-dark-800'
-                    : 'text-gray-300 hover:text-primary-500'
+                    ? 'text-primary-400 bg-white/10'
+                    : 'text-gray-400 hover:text-gray-100 hover:bg-white/5'
                 }`}
               >
                 Passi
@@ -119,36 +119,35 @@ export default function Header() {
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     isActive('/profile')
-                      ? 'text-primary-500 bg-dark-800'
-                      : 'text-gray-300 hover:text-primary-500'
+                      ? 'text-primary-400 bg-white/10'
+                      : 'text-gray-400 hover:text-gray-100 hover:bg-white/5'
                   }`}
                 >
                   Profilo
                 </Link>
               )}
-              {user ? (
-                <button
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-300 hover:text-primary-500"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Esci</span>
-                </button>
-              ) : (
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-2 px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md text-sm font-medium"
-                >
-                  <User className="w-4 h-4" />
-                  <span>Accedi</span>
-                </Link>
-              )}
+              <div className="pt-2">
+                {user ? (
+                  <button
+                    onClick={() => { logout(); setMobileMenuOpen(false); }}
+                    className="btn-secondary w-full flex items-center space-x-2 px-4 py-2.5 text-sm font-medium text-gray-300 rounded-lg"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Esci</span>
+                  </button>
+                ) : (
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="btn-primary flex items-center space-x-2 px-4 py-2.5 text-white rounded-lg text-sm font-medium"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Accedi</span>
+                  </Link>
+                )}
+              </div>
             </nav>
           </div>
         )}
@@ -156,4 +155,3 @@ export default function Header() {
     </header>
   );
 }
-

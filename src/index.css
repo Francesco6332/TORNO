@@ -4,12 +4,13 @@
 
 @layer base {
   * {
-    @apply border-dark-800;
+    box-sizing: border-box;
   }
-  
+
   body {
     @apply bg-dark-950 text-gray-100 antialiased;
     font-family: 'Inter', system-ui, sans-serif;
+    background-color: #07070f;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -18,45 +19,147 @@
   }
 }
 
+@layer components {
+  /* ── Liquid Glass Base ── */
+  .glass {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .glass-strong {
+    background: rgba(10, 10, 20, 0.75);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Card glass — used for content panels */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(220, 38, 38, 0.25);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(220, 38, 38, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  }
+
+  /* Red-tinted glass — badges, accents */
+  .glass-red {
+    background: rgba(185, 28, 28, 0.12);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(220, 38, 38, 0.22);
+  }
+
+  /* Primary action button */
+  .btn-primary {
+    background: rgba(185, 28, 28, 0.9);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(239, 68, 68, 0.45);
+    box-shadow:
+      0 0 24px rgba(185, 28, 28, 0.45),
+      0 4px 16px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background: rgba(220, 38, 38, 1);
+    box-shadow:
+      0 0 36px rgba(185, 28, 28, 0.6),
+      0 8px 24px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+  }
+
+  /* Secondary ghost button */
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    transition: all 0.2s ease;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+  }
+}
+
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
 
   .text-shadow {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  }
+
+  .text-glow-red {
+    text-shadow:
+      0 0 24px rgba(239, 68, 68, 0.55),
+      0 0 80px rgba(185, 28, 28, 0.25);
   }
 
   .gradient-overlay {
-    background: linear-gradient(180deg, rgba(26, 26, 26, 0) 0%, rgba(26, 26, 26, 0.8) 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(7, 7, 15, 0) 0%,
+      rgba(7, 7, 15, 0.82) 100%
+    );
+  }
+
+  .glow-red {
+    box-shadow:
+      0 0 24px rgba(185, 28, 28, 0.45),
+      0 0 60px rgba(185, 28, 28, 0.15);
   }
 }
 
-/* Leaflet map styles */
+/* ── Leaflet map overrides ── */
 .leaflet-container {
-  background: #1a1a1a;
+  background: #07070f;
   height: 100%;
   width: 100%;
   z-index: 0;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #1f2937;
+  background: rgba(10, 10, 22, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   color: #f3f4f6;
-  border-radius: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .leaflet-popup-tip {
-  background: #1f2937;
+  background: rgba(10, 10, 22, 0.92);
 }
 
-/* Fix per il rendering della mappa */
 .leaflet-container .leaflet-tile-container img {
   max-width: none !important;
 }
-

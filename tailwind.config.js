@@ -28,9 +28,9 @@ export default {
           500: '#6b7280',
           600: '#4b5563',
           700: '#374151',
-          800: '#1f2937',
-          900: '#111827',
-          950: '#0a0a0a',
+          800: '#1a1f2e',
+          900: '#0f1118',
+          950: '#07070f',
         },
       },
       fontFamily: {
@@ -39,9 +39,24 @@ export default {
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 14s ease-in-out infinite',
+        'float-slow': 'float 20s ease-in-out infinite 4s',
+        'float-fast': 'float 9s ease-in-out infinite 2s',
+        'fade-up': 'fadeUp 0.6s ease-out',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '25%': { transform: 'translate(30px, -40px) scale(1.05)' },
+          '50%': { transform: 'translate(-15px, -20px) scale(0.98)' },
+          '75%': { transform: 'translate(-30px, 25px) scale(1.02)' },
+        },
+        fadeUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
     },
   },
   plugins: [],
 }
-
