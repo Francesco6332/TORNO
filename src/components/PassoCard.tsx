@@ -20,6 +20,7 @@ export default function PassoCard({ passo }: PassoCardProps) {
   const [isFavorite, setIsFavorite] = useState(favoritesStorage.has(passo.id));
   const [imageError, setImageError] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
+  const [voteError, setVoteError] = useState(false);
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
   const { t } = useTranslation();
   const { user, signInWithGoogle } = useAuth();
@@ -50,13 +51,18 @@ export default function PassoCard({ passo }: PassoCardProps) {
   const handleUpvote = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
+    setVoteError(false);
 
-    if (!user) {
-      await signInWithGoogle();
-      return;
+    try {
+      if (!user) {
+        await signInWithGoogle();
+        return;
+      }
+
+      await toggleUpvote.mutateAsync({ passoId: passo.id, userId: user.uid });
+    } catch {
+      setVoteError(true);
     }
-
-    toggleUpvote.mutate({ passoId: passo.id, userId: user.uid });
   };
 
   const upvoteCount = passo.upvoteCount ?? passo.upvotedBy?.length ?? 0;
@@ -103,6 +109,7 @@ export default function PassoCard({ passo }: PassoCardProps) {
             count={upvoteCount}
             isUpvoted={isUpvoted}
             isLoading={toggleUpvote.isPending}
+            hasError={voteError}
             compact
             onClick={handleUpvote}
           />

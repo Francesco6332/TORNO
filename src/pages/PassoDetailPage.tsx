@@ -22,6 +22,7 @@ export default function PassoDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
+  const [voteError, setVoteError] = useState(false);
   const { language, t } = useTranslation();
   const { user, signInWithGoogle } = useAuth();
   const toggleUpvoteMutation = useTogglePassoUpvote();
@@ -58,15 +59,20 @@ export default function PassoDetailPage() {
 
   const handleUpvote = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    setVoteError(false);
 
     if (!passo) return;
 
-    if (!user) {
-      await signInWithGoogle();
-      return;
-    }
+    try {
+      if (!user) {
+        await signInWithGoogle();
+        return;
+      }
 
-    toggleUpvoteMutation.mutate({ passoId: passo.id, userId: user.uid });
+      await toggleUpvoteMutation.mutateAsync({ passoId: passo.id, userId: user.uid });
+    } catch {
+      setVoteError(true);
+    }
   };
 
   if (isLoading) {
@@ -138,6 +144,7 @@ export default function PassoDetailPage() {
             count={upvoteCount}
             isUpvoted={isUpvoted}
             isLoading={toggleUpvoteMutation.isPending}
+            hasError={voteError}
             onClick={handleUpvote}
           />
         </div>
@@ -257,6 +264,11 @@ export default function PassoDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {voteError && (
+            <div className="glass-red rounded-xl p-3 text-sm text-red-300">
+              {t('votes.error')}
+            </div>
+          )}
           <WeatherWidget lat={passo.coordinates.lat} lng={passo.coordinates.lng} />
         </div>
       </div>

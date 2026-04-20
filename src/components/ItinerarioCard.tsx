@@ -15,6 +15,7 @@ interface ItinerarioCardProps {
 
 export default function ItinerarioCard({ itinerary }: ItinerarioCardProps) {
   const [imageError, setImageError] = useState(false);
+  const [voteError, setVoteError] = useState(false);
   const difficulty = DIFFICULTY_LEVELS[itinerary.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
   const { t } = useTranslation();
   const { user, signInWithGoogle } = useAuth();
@@ -32,13 +33,18 @@ export default function ItinerarioCard({ itinerary }: ItinerarioCardProps) {
   const handleUpvote = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
+    setVoteError(false);
 
-    if (!user) {
-      await signInWithGoogle();
-      return;
+    try {
+      if (!user) {
+        await signInWithGoogle();
+        return;
+      }
+
+      await toggleUpvote.mutateAsync({ itineraryId: itinerary.id, userId: user.uid });
+    } catch {
+      setVoteError(true);
     }
-
-    toggleUpvote.mutate({ itineraryId: itinerary.id, userId: user.uid });
   };
 
   return (
@@ -76,6 +82,7 @@ export default function ItinerarioCard({ itinerary }: ItinerarioCardProps) {
             count={upvoteCount}
             isUpvoted={isUpvoted}
             isLoading={toggleUpvote.isPending}
+            hasError={voteError}
             compact
             onClick={handleUpvote}
           />

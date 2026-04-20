@@ -165,6 +165,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'profile.noRecent': 'Nessun passo visualizzato di recente',
     'votes.add': 'Aggiungi voto',
     'votes.remove': 'Rimuovi voto',
+    'votes.error': 'Non è stato possibile registrare il voto. Verifica le regole Firebase e riprova.',
     'imageUpload.uploading': 'Caricamento immagine...',
   },
   en: {
@@ -328,6 +329,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'profile.noRecent': 'No recently viewed passes',
     'votes.add': 'Add vote',
     'votes.remove': 'Remove vote',
+    'votes.error': 'Could not save your vote. Check Firebase rules and try again.',
     'imageUpload.uploading': 'Uploading image...',
   },
 };
