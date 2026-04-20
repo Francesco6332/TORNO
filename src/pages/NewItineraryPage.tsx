@@ -149,8 +149,8 @@ export default function NewItineraryPage() {
       });
 
       navigate('/itinerari', { replace: true, state: { createdItineraryId: itineraryId } });
-    } catch {
-      setError(t('itinerari.form.errors.save'));
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : t('itinerari.form.errors.save'));
     } finally {
       setIsUploadingImage(false);
     }

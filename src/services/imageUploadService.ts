@@ -5,6 +5,22 @@ interface SignedUploadResponse {
   uploadUrl: string;
 }
 
+interface UploadErrorResponse {
+  error?: string;
+  missing?: string[];
+}
+
+const getUploadErrorMessage = async (response: Response): Promise<string> => {
+  try {
+    const body = await response.json() as UploadErrorResponse;
+    const missing = body.missing?.length ? ` Missing: ${body.missing.join(', ')}` : '';
+
+    return `${body.error || 'Unable to prepare image upload.'}${missing}`;
+  } catch {
+    return 'Unable to prepare image upload.';
+  }
+};
+
 export const imageUploadService = {
   async upload(file: File, folder: string): Promise<string> {
     const signedUrlResponse = await fetch('/api/upload-url', {
@@ -20,7 +36,7 @@ export const imageUploadService = {
     });
 
     if (!signedUrlResponse.ok) {
-      throw new Error('Unable to prepare image upload');
+      throw new Error(await getUploadErrorMessage(signedUrlResponse));
     }
 
     const signedUpload = await signedUrlResponse.json() as SignedUploadResponse;

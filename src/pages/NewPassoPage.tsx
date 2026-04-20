@@ -110,8 +110,8 @@ export default function NewPassoPage() {
       });
 
       navigate(`/passi/${passoId}`, { replace: true });
-    } catch {
-      setError(t('passi.form.errors.save'));
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : t('passi.form.errors.save'));
     } finally {
       setIsUploadingImage(false);
     }

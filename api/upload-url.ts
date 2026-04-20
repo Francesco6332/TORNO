@@ -20,6 +20,9 @@ interface VercelResponse {
 const MAX_UPLOAD_SIZE_MB = 8;
 const UPLOAD_EXPIRES_SECONDS = 300;
 
+const firstDefined = (...values: Array<string | undefined>) =>
+  values.find((value) => value && value.trim())?.trim() || '';
+
 const hmac = (key: crypto.BinaryLike | crypto.KeyObject, value: string) =>
   crypto.createHmac('sha256', key).update(value).digest();
 
@@ -32,6 +35,18 @@ const getSignatureKey = (secret: string, dateStamp: string, region: string) => {
   const regionKey = hmac(dateKey, region);
   const serviceKey = hmac(regionKey, 's3');
   return hmac(serviceKey, 'aws4_request');
+};
+
+const getSpacesHost = (bucket: string, region: string, endpoint = '') => {
+  const normalizedEndpoint = endpoint.trim().replace(/^https?:\/\//, '').replace(/\/+$/, '');
+
+  if (!normalizedEndpoint) {
+    return `${bucket}.${region}.digitaloceanspaces.com`;
+  }
+
+  return normalizedEndpoint.includes(bucket)
+    ? normalizedEndpoint
+    : `${bucket}.${normalizedEndpoint}`;
 };
 
 const parseBody = (body: UploadUrlRequest | string | undefined): UploadUrlRequest => {
@@ -70,6 +85,7 @@ const createPresignedPutUrl = ({
   key,
   region,
   secret,
+  spacesEndpoint,
 }: {
   accessKey: string;
   bucket: string;
@@ -77,11 +93,12 @@ const createPresignedPutUrl = ({
   key: string;
   region: string;
   secret: string;
+  spacesEndpoint?: string;
 }) => {
   const now = new Date();
   const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, '');
   const dateStamp = amzDate.slice(0, 8);
-  const host = `${bucket}.${region}.digitaloceanspaces.com`;
+  const host = getSpacesHost(bucket, region, spacesEndpoint);
   const credentialScope = `${dateStamp}/${region}/s3/aws4_request`;
   const signedHeaders = 'content-type;host;x-amz-acl';
   const canonicalUri = `/${encodePath(key)}`;
@@ -119,6 +136,7 @@ const createPresignedPutUrl = ({
 };
 
 export default function handler(request: VercelRequest, response: VercelResponse) {
+  response.setHeader('Access-Control-Allow-Origin', '*');
   response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -132,14 +150,49 @@ export default function handler(request: VercelRequest, response: VercelResponse
     return;
   }
 
-  const accessKey = process.env.DO_SPACES_KEY;
-  const secret = process.env.DO_SPACES_SECRET;
-  const bucket = process.env.DO_SPACES_BUCKET || process.env.VITE_DO_SPACES_BUCKET;
-  const region = process.env.DO_SPACES_REGION || process.env.VITE_DO_SPACES_REGION || 'nyc3';
-  const cdnEndpoint = process.env.DO_SPACES_CDN_ENDPOINT || process.env.VITE_DO_SPACES_CDN_ENDPOINT || '';
+  const accessKey = firstDefined(
+    process.env.DO_SPACES_KEY,
+    process.env.DO_SPACES_ACCESS_KEY,
+    process.env.DO_SPACES_ACCESS_KEY_ID,
+    process.env.AWS_ACCESS_KEY_ID
+  );
+  const secret = firstDefined(
+    process.env.DO_SPACES_SECRET,
+    process.env.DO_SPACES_SECRET_KEY,
+    process.env.DO_SPACES_SECRET_ACCESS_KEY,
+    process.env.AWS_SECRET_ACCESS_KEY
+  );
+  const bucket = firstDefined(
+    process.env.DO_SPACES_BUCKET,
+    process.env.SPACES_BUCKET,
+    process.env.VITE_DO_SPACES_BUCKET
+  );
+  const region = firstDefined(
+    process.env.DO_SPACES_REGION,
+    process.env.SPACES_REGION,
+    process.env.VITE_DO_SPACES_REGION
+  ) || 'nyc3';
+  const spacesEndpoint = firstDefined(
+    process.env.DO_SPACES_ENDPOINT,
+    process.env.SPACES_ENDPOINT,
+    process.env.VITE_DO_SPACES_ENDPOINT
+  );
+  const cdnEndpoint = firstDefined(
+    process.env.DO_SPACES_CDN_ENDPOINT,
+    process.env.SPACES_CDN_ENDPOINT,
+    process.env.VITE_DO_SPACES_CDN_ENDPOINT
+  );
 
   if (!accessKey || !secret || !bucket) {
-    response.status(500).json({ error: 'DigitalOcean Spaces is not configured' });
+    response.status(500).json({
+      code: 'spaces_not_configured',
+      error: 'DigitalOcean Spaces is not configured',
+      missing: [
+        !accessKey ? 'DO_SPACES_KEY' : '',
+        !secret ? 'DO_SPACES_SECRET' : '',
+        !bucket ? 'DO_SPACES_BUCKET' : '',
+      ].filter(Boolean),
+    });
     return;
   }
 
@@ -160,6 +213,7 @@ export default function handler(request: VercelRequest, response: VercelResponse
       key,
       region,
       secret,
+      spacesEndpoint,
     });
     const publicBaseUrl = cdnEndpoint
       ? cdnEndpoint.replace(/\/+$/, '')
