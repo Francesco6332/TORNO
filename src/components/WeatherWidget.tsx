@@ -22,7 +22,12 @@ export default function WeatherWidget({ lat, lng, className = '' }: WeatherWidge
   }
 
   if (error || !weather) {
-    return null;
+    return (
+      <div className={`bg-dark-800 rounded-lg p-4 border border-dark-700 ${className}`}>
+        <h4 className="text-sm font-medium text-gray-400 mb-1">Meteo</h4>
+        <p className="text-sm text-gray-500">Dati meteo non disponibili.</p>
+      </div>
+    );
   }
 
   const getWeatherIcon = (icon: string) => {
@@ -40,19 +45,21 @@ export default function WeatherWidget({ lat, lng, className = '' }: WeatherWidge
           </div>
           <p className="text-xs text-gray-500 capitalize mt-1">{weather.conditions}</p>
         </div>
-        {weather.icon && (
+        {weather.icon ? (
           <img
             src={getWeatherIcon(weather.icon)}
             alt={weather.conditions}
             className="w-12 h-12"
           />
+        ) : (
+          <Cloud className="w-10 h-10 text-primary-500" />
         )}
       </div>
 
       <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-dark-700">
         <div className="flex items-center space-x-2 text-xs text-gray-400">
           <Wind className="w-4 h-4 text-primary-500" />
-          <span>{weather.windSpeed} m/s</span>
+          <span>{weather.windSpeed.toFixed(1)} m/s</span>
         </div>
         <div className="flex items-center space-x-2 text-xs text-gray-400">
           <Droplets className="w-4 h-4 text-primary-500" />
@@ -70,4 +77,3 @@ export default function WeatherWidget({ lat, lng, className = '' }: WeatherWidge
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-import { getImageUrl } from '@/config/digitalOcean';
+import { getImageUrl, getImageUrlCandidates } from '@/config/digitalOcean';
 import type { Passo } from '@/types';
 
 /**
@@ -47,6 +47,14 @@ export const getPassoImageUrl = (passo: Passo): string => {
   return getImageUrl(autoPath);
 };
 
+export const getPassoImageUrlCandidates = (passo: Passo): string[] => {
+  if (passo.images && passo.images.length > 0 && passo.images[0]) {
+    return getImageUrlCandidates(passo.images[0]);
+  }
+
+  return getImageUrlCandidates(generatePassoImagePath(passo.name));
+};
+
 /**
  * Ottiene l'URL completo di un'immagine
  * Supporta sia Digital Ocean Spaces che Firebase Storage
@@ -83,4 +91,3 @@ export const preloadImage = (src: string): Promise<void> => {
 export const preloadImages = async (sources: string[]): Promise<void> => {
   await Promise.all(sources.map(src => preloadImage(src).catch(() => {})));
 };
-

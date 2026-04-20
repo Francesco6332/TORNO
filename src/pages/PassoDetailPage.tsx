@@ -1,7 +1,6 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, TrendingUp, Gauge, Calendar, Heart } from 'lucide-react';
 import { usePasso } from '@/hooks/usePassi';
-import { useWeather } from '@/hooks/useWeather';
 import Map from '@/components/Map';
 import WeatherWidget from '@/components/WeatherWidget';
 import { DIFFICULTY_LEVELS } from '@/config/constants';
@@ -10,17 +9,24 @@ import { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale/it';
-import { getPassoImageUrl } from '@/utils/imageUtils';
+import { getPassoImageUrlCandidates } from '@/utils/imageUtils';
 
 export default function PassoDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: passo, isLoading, error } = usePasso(id || '');
   const [isFavorite, setIsFavorite] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [imageIndex, setImageIndex] = useState(0);
 
-  const imageUrl = passo ? getPassoImageUrl(passo) : null;
+  const imageUrls = passo ? getPassoImageUrlCandidates(passo) : [];
+  const imageUrl = imageUrls[imageIndex];
 
   const handleImageError = () => {
+    if (imageIndex < imageUrls.length - 1) {
+      setImageIndex((current) => current + 1);
+      return;
+    }
+
     setImageError(true);
   };
 
@@ -29,14 +35,9 @@ export default function PassoDetailPage() {
       setIsFavorite(favoritesStorage.has(passo.id));
       recentViewsStorage.add(passo.id);
       setImageError(false); // Reset error quando cambia passo
+      setImageIndex(0);
     }
   }, [passo]);
-
-  const { data: weather } = useWeather(
-    passo?.coordinates.lat || 0,
-    passo?.coordinates.lng || 0,
-    !!passo
-  );
 
   const toggleFavorite = () => {
     if (!passo) return;
@@ -224,12 +225,9 @@ export default function PassoDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {weather && (
-            <WeatherWidget lat={passo.coordinates.lat} lng={passo.coordinates.lng} />
-          )}
+          <WeatherWidget lat={passo.coordinates.lat} lng={passo.coordinates.lng} />
         </div>
       </div>
     </div>
   );
 }
-

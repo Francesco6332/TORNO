@@ -3,6 +3,104 @@ import { cacheManager } from '@/utils/cache';
 import type { WeatherData } from '@/types';
 
 const getCacheKey = (lat: number, lng: number) => `weather_${lat}_${lng}`;
+const OPEN_METEO_API_URL = 'https://api.open-meteo.com/v1';
+
+const weatherCodeLabels: Record<number, string> = {
+  0: 'sereno',
+  1: 'prevalentemente sereno',
+  2: 'parzialmente nuvoloso',
+  3: 'coperto',
+  45: 'nebbia',
+  48: 'nebbia con brina',
+  51: 'pioviggine leggera',
+  53: 'pioviggine',
+  55: 'pioviggine intensa',
+  56: 'pioviggine gelata leggera',
+  57: 'pioviggine gelata intensa',
+  61: 'pioggia leggera',
+  63: 'pioggia',
+  65: 'pioggia intensa',
+  66: 'pioggia gelata leggera',
+  67: 'pioggia gelata intensa',
+  71: 'neve leggera',
+  73: 'neve',
+  75: 'neve intensa',
+  77: 'granelli di neve',
+  80: 'rovesci leggeri',
+  81: 'rovesci',
+  82: 'rovesci intensi',
+  85: 'rovesci di neve leggeri',
+  86: 'rovesci di neve intensi',
+  95: 'temporale',
+  96: 'temporale con grandine leggera',
+  99: 'temporale con grandine intensa',
+};
+
+const fetchOpenWeather = async (lat: number, lng: number): Promise<WeatherData> => {
+  const response = await fetch(
+    `${WEATHER_API_URL}/weather?lat=${lat}&lon=${lng}&appid=${WEATHER_API_KEY}&units=metric&lang=it`
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch OpenWeather data');
+  }
+
+  const data = await response.json();
+
+  return {
+    temp: Math.round(data.main.temp),
+    feelsLike: Math.round(data.main.feels_like),
+    humidity: data.main.humidity,
+    windSpeed: data.wind?.speed || 0,
+    windDirection: data.wind?.deg || 0,
+    conditions: data.weather[0]?.description || '',
+    icon: data.weather[0]?.icon || '',
+    visibility: data.visibility ? data.visibility / 1000 : 10,
+  };
+};
+
+const fetchOpenMeteo = async (lat: number, lng: number): Promise<WeatherData> => {
+  const params = new URLSearchParams({
+    latitude: String(lat),
+    longitude: String(lng),
+    current: [
+      'temperature_2m',
+      'relative_humidity_2m',
+      'apparent_temperature',
+      'weather_code',
+      'wind_speed_10m',
+      'wind_direction_10m',
+      'visibility',
+    ].join(','),
+    wind_speed_unit: 'ms',
+    timezone: 'auto',
+  });
+
+  const response = await fetch(`${OPEN_METEO_API_URL}/forecast?${params.toString()}`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch Open-Meteo data');
+  }
+
+  const data = await response.json();
+  const current = data.current;
+  const weatherCode = Number(current?.weather_code);
+
+  if (!current) {
+    throw new Error('Open-Meteo response is missing current weather');
+  }
+
+  return {
+    temp: Math.round(current.temperature_2m),
+    feelsLike: Math.round(current.apparent_temperature ?? current.temperature_2m),
+    humidity: Math.round(current.relative_humidity_2m ?? 0),
+    windSpeed: Number((current.wind_speed_10m ?? 0).toFixed(1)),
+    windDirection: Math.round(current.wind_direction_10m ?? 0),
+    conditions: weatherCodeLabels[weatherCode] || 'meteo non disponibile',
+    icon: '',
+    visibility: current.visibility ? Math.round(current.visibility / 1000) : 0,
+  };
+};
 
 export const weatherService = {
   async getWeather(lat: number, lng: number): Promise<WeatherData> {
@@ -14,32 +112,26 @@ export const weatherService = {
     }
 
     try {
-      const response = await fetch(
-        `${WEATHER_API_URL}/weather?lat=${lat}&lon=${lng}&appid=${WEATHER_API_KEY}&units=metric&lang=it`
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch weather data');
-      }
-
-      const data = await response.json();
-      
-      const weatherData: WeatherData = {
-        temp: Math.round(data.main.temp),
-        feelsLike: Math.round(data.main.feels_like),
-        humidity: data.main.humidity,
-        windSpeed: data.wind?.speed || 0,
-        windDirection: data.wind?.deg || 0,
-        conditions: data.weather[0]?.description || '',
-        icon: data.weather[0]?.icon || '',
-        visibility: data.visibility ? data.visibility / 1000 : 10, // convert to km
-      };
+      const weatherData = WEATHER_API_KEY
+        ? await fetchOpenWeather(lat, lng)
+        : await fetchOpenMeteo(lat, lng);
 
       cacheManager.set(cacheKey, weatherData, CACHE_DURATION.WEATHER);
       return weatherData;
-    } catch (error) {
-      console.error('Error fetching weather:', error);
-      throw error;
+    } catch (primaryError) {
+      if (WEATHER_API_KEY) {
+        try {
+          const weatherData = await fetchOpenMeteo(lat, lng);
+          cacheManager.set(cacheKey, weatherData, CACHE_DURATION.WEATHER);
+          return weatherData;
+        } catch (fallbackError) {
+          console.error('Error fetching weather:', primaryError, fallbackError);
+          throw fallbackError;
+        }
+      }
+
+      console.error('Error fetching weather:', primaryError);
+      throw primaryError;
     }
   },
 
@@ -67,4 +159,3 @@ export const weatherService = {
     return weatherMap;
   },
 };
-

@@ -6,7 +6,7 @@ import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import type { Passo } from '@/types';
 import clsx from 'clsx';
-import { getPassoImageUrl } from '@/utils/imageUtils';
+import { getPassoImageUrlCandidates } from '@/utils/imageUtils';
 
 interface PassoCardProps {
   passo: Passo;
@@ -15,11 +15,18 @@ interface PassoCardProps {
 export default function PassoCard({ passo }: PassoCardProps) {
   const [isFavorite, setIsFavorite] = useState(favoritesStorage.has(passo.id));
   const [imageError, setImageError] = useState(false);
+  const [imageIndex, setImageIndex] = useState(0);
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
   
-  const imageUrl = getPassoImageUrl(passo);
+  const imageUrls = getPassoImageUrlCandidates(passo);
+  const imageUrl = imageUrls[imageIndex];
 
   const handleImageError = () => {
+    if (imageIndex < imageUrls.length - 1) {
+      setImageIndex((current) => current + 1);
+      return;
+    }
+
     setImageError(true);
   };
 
@@ -119,4 +126,3 @@ export default function PassoCard({ passo }: PassoCardProps) {
     </Link>
   );
 }
-
