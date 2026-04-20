@@ -2,11 +2,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { User, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from '@/i18n/useTranslation';
 
 export default function Header() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -33,7 +36,7 @@ export default function Header() {
                   : 'text-gray-400 hover:text-gray-100 hover:bg-white/6'
               }`}
             >
-              Home
+              {t('nav.home')}
             </Link>
             <Link
               to="/passi"
@@ -43,7 +46,7 @@ export default function Header() {
                   : 'text-gray-400 hover:text-gray-100 hover:bg-white/6'
               }`}
             >
-              Passi
+              {t('nav.passi')}
             </Link>
             {user && (
               <Link
@@ -54,20 +57,21 @@ export default function Header() {
                     : 'text-gray-400 hover:text-gray-100 hover:bg-white/6'
                 }`}
               >
-                Profilo
+                {t('nav.profile')}
               </Link>
             )}
           </nav>
 
           {/* Auth Section */}
           <div className="hidden md:flex items-center space-x-3">
+            <LanguageSwitcher />
             {user ? (
               <button
                 onClick={logout}
                 className="btn-secondary flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-300 rounded-lg"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Esci</span>
+                <span>{t('auth.signOut')}</span>
               </button>
             ) : (
               <Link
@@ -75,7 +79,7 @@ export default function Header() {
                 className="btn-primary flex items-center space-x-2 px-4 py-2 text-white rounded-lg text-sm font-medium"
               >
                 <User className="w-4 h-4" />
-                <span>Accedi</span>
+                <span>{t('auth.signIn')}</span>
               </Link>
             )}
           </div>
@@ -102,7 +106,7 @@ export default function Header() {
                     : 'text-gray-400 hover:text-gray-100 hover:bg-white/5'
                 }`}
               >
-                Home
+                {t('nav.home')}
               </Link>
               <Link
                 to="/passi"
@@ -113,7 +117,7 @@ export default function Header() {
                     : 'text-gray-400 hover:text-gray-100 hover:bg-white/5'
                 }`}
               >
-                Passi
+                {t('nav.passi')}
               </Link>
               {user && (
                 <Link
@@ -125,17 +129,20 @@ export default function Header() {
                       : 'text-gray-400 hover:text-gray-100 hover:bg-white/5'
                   }`}
                 >
-                  Profilo
+                  {t('nav.profile')}
                 </Link>
               )}
               <div className="pt-2">
+                <div className="mb-3">
+                  <LanguageSwitcher />
+                </div>
                 {user ? (
                   <button
                     onClick={() => { logout(); setMobileMenuOpen(false); }}
                     className="btn-secondary w-full flex items-center space-x-2 px-4 py-2.5 text-sm font-medium text-gray-300 rounded-lg"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Esci</span>
+                    <span>{t('auth.signOut')}</span>
                   </button>
                 ) : (
                   <Link
@@ -144,7 +151,7 @@ export default function Header() {
                     className="btn-primary flex items-center space-x-2 px-4 py-2.5 text-white rounded-lg text-sm font-medium"
                   >
                     <User className="w-4 h-4" />
-                    <span>Accedi</span>
+                    <span>{t('auth.signIn')}</span>
                   </Link>
                 )}
               </div>

@@ -2,6 +2,7 @@ import { DIFFICULTY_LEVELS, VEHICLE_TYPES } from '@/config/constants';
 import { Filter, X } from 'lucide-react';
 import type { DifficultyLevel, VehicleType } from '@/types';
 import clsx from 'clsx';
+import { useTranslation } from '@/i18n/useTranslation';
 
 interface FilterBarProps {
   selectedDifficulty?: DifficultyLevel | null;
@@ -19,19 +20,20 @@ export default function FilterBar({
   onClearFilters,
 }: FilterBarProps) {
   const hasActiveFilters = selectedDifficulty || selectedVehicleType;
+  const { t } = useTranslation();
 
   return (
     <div className="bg-dark-800 rounded-lg p-4 border border-dark-700">
       <div className="flex items-center space-x-4 mb-4">
         <Filter className="w-5 h-5 text-primary-500" />
-        <h3 className="text-lg font-display text-white">Filtri</h3>
+        <h3 className="text-lg font-display text-white">{t('filters.title')}</h3>
         {hasActiveFilters && (
           <button
             onClick={onClearFilters}
             className="ml-auto flex items-center space-x-1 text-sm text-gray-400 hover:text-primary-500 transition-colors"
           >
             <X className="w-4 h-4" />
-            <span>Rimuovi filtri</span>
+            <span>{t('filters.clear')}</span>
           </button>
         )}
       </div>
@@ -40,7 +42,7 @@ export default function FilterBar({
         {/* Difficulty Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-2">
-            Difficoltà
+            {t('filters.difficulty')}
           </label>
           <div className="flex flex-wrap gap-2">
             {Object.values(DIFFICULTY_LEVELS).map((level) => (
@@ -63,7 +65,7 @@ export default function FilterBar({
                     : 'bg-dark-700 text-gray-400 hover:bg-dark-600 border border-dark-600'
                 )}
               >
-                {level.icon} {level.label}
+                {level.icon} {t(`difficulty.${level.value}`)}
               </button>
             ))}
           </div>
@@ -72,7 +74,7 @@ export default function FilterBar({
         {/* Vehicle Type Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-2">
-            Tipo Veicolo
+            {t('filters.vehicleType')}
           </label>
           <div className="flex flex-wrap gap-2">
             {Object.entries(VEHICLE_TYPES).map(([, value]) => (
@@ -90,7 +92,11 @@ export default function FilterBar({
                     : 'bg-dark-700 text-gray-400 hover:bg-dark-600 border border-dark-600'
                 )}
               >
-                {value === 'motorcycle' ? '🏍️ Moto' : value === 'car' ? '🚗 Auto' : '🚗🏍️ Entrambi'}
+                {value === 'motorcycle'
+                  ? `🏍️ ${t('vehicle.motorcycle')}`
+                  : value === 'car'
+                    ? `🚗 ${t('vehicle.car')}`
+                    : `🚗🏍️ ${t('vehicle.both')}`}
               </button>
             ))}
           </div>
@@ -99,4 +105,3 @@ export default function FilterBar({
     </div>
   );
 }
-

@@ -5,10 +5,12 @@ import { Link } from 'react-router-dom';
 import { usePassi } from '@/hooks/usePassi';
 import PassoCard from '@/components/PassoCard';
 import { favoritesStorage, recentViewsStorage } from '@/utils/storage';
+import { useTranslation } from '@/i18n/useTranslation';
 
 export default function ProfilePage() {
   const { user, loading, signInWithGoogle, logout } = useAuth();
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
   const { data: allPassi = [] } = usePassi();
   const favoriteIds = favoritesStorage.get();
@@ -21,8 +23,8 @@ export default function ProfilePage() {
     try {
       setError('');
       await signInWithGoogle();
-    } catch (err: any) {
-      setError(err.message || 'Errore durante l\'autenticazione con Google');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('profile.googleError'));
     }
   };
 
@@ -46,9 +48,9 @@ export default function ProfilePage() {
             <User className="w-8 h-8 text-primary-400" />
           </div>
 
-          <h1 className="text-4xl font-display text-white mb-2">Accedi</h1>
+          <h1 className="text-4xl font-display text-white mb-2">{t('profile.signInTitle')}</h1>
           <p className="text-gray-400 text-sm mb-8">
-            Accedi per salvare i tuoi passi preferiti e tenere traccia delle visualizzazioni recenti.
+            {t('profile.signInDescription')}
           </p>
 
           {error && (
@@ -67,7 +69,7 @@ export default function ProfilePage() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            Continua con Google
+            {t('profile.googleSignIn')}
           </button>
         </div>
       </div>
@@ -82,7 +84,7 @@ export default function ProfilePage() {
           {user.photoURL ? (
             <img
               src={user.photoURL}
-              alt={user.displayName || 'User'}
+              alt={user.displayName || t('profile.userAlt')}
               className="w-16 h-16 rounded-2xl ring-2 ring-white/10"
             />
           ) : (
@@ -105,7 +107,7 @@ export default function ProfilePage() {
           className="btn-secondary inline-flex items-center gap-2 px-4 py-2 text-gray-300 rounded-xl text-sm font-medium"
         >
           <LogOut className="w-4 h-4" />
-          Esci
+          {t('auth.signOut')}
         </button>
       </div>
 
@@ -113,7 +115,7 @@ export default function ProfilePage() {
       <section className="mb-12">
         <div className="flex items-center gap-2 mb-6">
           <Heart className="w-5 h-5 text-primary-500" />
-          <h2 className="text-3xl font-display text-white">Preferiti</h2>
+          <h2 className="text-3xl font-display text-white">{t('profile.favorites')}</h2>
           {favorites.length > 0 && (
             <span className="glass-red text-primary-400 text-xs font-semibold px-2 py-0.5 rounded-full ml-1">
               {favorites.length}
@@ -123,9 +125,9 @@ export default function ProfilePage() {
         {favorites.length === 0 ? (
           <div className="glass-card rounded-2xl p-10 text-center">
             <Heart className="w-10 h-10 text-white/10 mx-auto mb-4" />
-            <p className="text-gray-400 mb-3">Nessun passo nei preferiti</p>
+            <p className="text-gray-400 mb-3">{t('profile.noFavorites')}</p>
             <Link to="/passi" className="text-primary-400 hover:text-primary-300 transition-colors text-sm">
-              Esplora i passi →
+              {t('profile.explorePasses')}
             </Link>
           </div>
         ) : (
@@ -141,7 +143,7 @@ export default function ProfilePage() {
       <section>
         <div className="flex items-center gap-2 mb-6">
           <Clock className="w-5 h-5 text-primary-500" />
-          <h2 className="text-3xl font-display text-white">Visualizzati di Recente</h2>
+          <h2 className="text-3xl font-display text-white">{t('profile.recent')}</h2>
           {recent.length > 0 && (
             <span className="glass-red text-primary-400 text-xs font-semibold px-2 py-0.5 rounded-full ml-1">
               {recent.length}
@@ -151,7 +153,7 @@ export default function ProfilePage() {
         {recent.length === 0 ? (
           <div className="glass-card rounded-2xl p-10 text-center">
             <Clock className="w-10 h-10 text-white/10 mx-auto mb-4" />
-            <p className="text-gray-400">Nessun passo visualizzato di recente</p>
+            <p className="text-gray-400">{t('profile.noRecent')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

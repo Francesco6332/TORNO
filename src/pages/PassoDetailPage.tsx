@@ -9,7 +9,9 @@ import { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale/it';
+import { enUS } from 'date-fns/locale/en-US';
 import { getPassoImageUrlCandidates } from '@/utils/imageUtils';
+import { useTranslation } from '@/i18n/useTranslation';
 
 export default function PassoDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +19,7 @@ export default function PassoDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
+  const { language, t } = useTranslation();
 
   const imageUrls = passo ? getPassoImageUrlCandidates(passo) : [];
   const imageUrl = imageUrls[imageIndex];
@@ -63,6 +66,7 @@ export default function PassoDetailPage() {
   if (error || !passo) return <Navigate to="/passi" replace />;
 
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
+  const dateLocale = language === 'it' ? it : enUS;
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -72,7 +76,7 @@ export default function PassoDetailPage() {
         className="inline-flex items-center gap-2 text-gray-500 hover:text-primary-400 transition-colors mb-8 text-sm"
       >
         <ArrowLeft className="w-4 h-4" />
-        Torna ai passi
+        {t('detail.back')}
       </Link>
 
       {/* Page header */}
@@ -90,7 +94,11 @@ export default function PassoDetailPage() {
               {passo.updatedAt && (
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
-                  <span>Aggiornato {format(passo.updatedAt, 'd MMMM yyyy', { locale: it })}</span>
+                  <span>
+                    {t('detail.updated', {
+                      date: format(passo.updatedAt, 'd MMMM yyyy', { locale: dateLocale }),
+                    })}
+                  </span>
                 </div>
               )}
             </div>
@@ -117,10 +125,14 @@ export default function PassoDetailPage() {
             difficulty.color === 'orange' && 'bg-orange-500/15 text-orange-400 border border-orange-500/20',
             difficulty.color === 'red' && 'bg-red-500/15 text-red-400 border border-red-500/20',
           )}>
-            {difficulty.icon} {difficulty.label}
+            {difficulty.icon} {t(`difficulty.${difficulty.value}`)}
           </span>
           <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/6 text-gray-400 border border-white/8">
-            {passo.vehicleType === 'both' ? 'Moto/Auto' : passo.vehicleType === 'motorcycle' ? 'Moto' : 'Auto'}
+            {passo.vehicleType === 'both'
+              ? t('vehicle.bothShort')
+              : passo.vehicleType === 'motorcycle'
+                ? t('vehicle.motorcycle')
+                : t('vehicle.car')}
           </span>
         </div>
       </div>
@@ -144,18 +156,18 @@ export default function PassoDetailPage() {
         <div className="lg:col-span-2 space-y-8">
           {/* Description */}
           <section className="glass-card rounded-2xl p-6">
-            <h2 className="text-2xl font-display text-white mb-4">Descrizione</h2>
+            <h2 className="text-2xl font-display text-white mb-4">{t('detail.description')}</h2>
             <p className="text-gray-300 leading-relaxed">{passo.description}</p>
           </section>
 
           {/* Stats */}
           <section className="glass-card rounded-2xl p-6">
-            <h2 className="text-2xl font-display text-white mb-6">Informazioni</h2>
+            <h2 className="text-2xl font-display text-white mb-6">{t('detail.info')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               <div>
                 <div className="flex items-center gap-2 text-gray-500 mb-1.5 text-xs uppercase tracking-wider">
                   <TrendingUp className="w-4 h-4 text-primary-500/60" />
-                  Quota
+                  {t('detail.elevation')}
                 </div>
                 <p className="text-2xl font-display text-white">{passo.elevation.toLocaleString()} m</p>
               </div>
@@ -163,7 +175,7 @@ export default function PassoDetailPage() {
                 <div>
                   <div className="flex items-center gap-2 text-gray-500 mb-1.5 text-xs uppercase tracking-wider">
                     <Gauge className="w-4 h-4 text-primary-500/60" />
-                    Lunghezza
+                    {t('detail.length')}
                   </div>
                   <p className="text-2xl font-display text-white">{passo.length} km</p>
                 </div>
@@ -172,7 +184,7 @@ export default function PassoDetailPage() {
                 <div>
                   <div className="flex items-center gap-2 text-gray-500 mb-1.5 text-xs uppercase tracking-wider">
                     <TrendingUp className="w-4 h-4 text-primary-500/60" />
-                    Pendenza Max
+                    {t('detail.maxGradient')}
                   </div>
                   <p className="text-2xl font-display text-white">{passo.maxGradient}%</p>
                 </div>
@@ -181,7 +193,7 @@ export default function PassoDetailPage() {
                 <div>
                   <div className="flex items-center gap-2 text-gray-500 mb-1.5 text-xs uppercase tracking-wider">
                     <MapPin className="w-4 h-4 text-primary-500/60" />
-                    Superficie
+                    {t('detail.surface')}
                   </div>
                   <p className="text-2xl font-display text-white capitalize">{passo.surface}</p>
                 </div>
@@ -191,7 +203,7 @@ export default function PassoDetailPage() {
 
           {/* Map */}
           <section>
-            <h2 className="text-2xl font-display text-white mb-4">Posizione</h2>
+            <h2 className="text-2xl font-display text-white mb-4">{t('detail.position')}</h2>
             <div className="glass-card rounded-2xl p-1.5">
               <div className="h-80 rounded-xl overflow-hidden">
                 <Map passi={[passo]} selectedPasso={passo} />
@@ -202,7 +214,7 @@ export default function PassoDetailPage() {
           {/* Tags */}
           {passo.tags && passo.tags.length > 0 && (
             <section>
-              <h2 className="text-2xl font-display text-white mb-4">Tag</h2>
+              <h2 className="text-2xl font-display text-white mb-4">{t('detail.tags')}</h2>
               <div className="flex flex-wrap gap-2">
                 {passo.tags.map((tag) => (
                   <span

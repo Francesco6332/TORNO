@@ -3,10 +3,12 @@ import { ArrowRight, MapPin, TrendingUp, Users, ChevronDown } from 'lucide-react
 import { usePassi } from '@/hooks/usePassi';
 import PassoCard from '@/components/PassoCard';
 import Map from '@/components/Map';
+import { useTranslation } from '@/i18n/useTranslation';
 
 export default function HomePage() {
   const { data: passi = [], isLoading } = usePassi();
   const featuredPassi = passi.slice(0, 6);
+  const { t } = useTranslation();
 
   return (
     <div>
@@ -25,7 +27,7 @@ export default function HomePage() {
         {/* Badge */}
         <div className="glass-red rounded-full px-4 py-1.5 inline-flex items-center gap-2 text-primary-300 text-sm font-medium mb-8 animate-fade-up relative z-10">
           <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
-          La guida italiana ai passi di montagna
+          {t('home.badge')}
         </div>
 
         {/* Main title */}
@@ -38,7 +40,7 @@ export default function HomePage() {
 
         {/* Subtitle */}
         <p className="text-lg md:text-xl text-gray-400 max-w-lg mb-10 relative z-10 leading-relaxed">
-          Scopri i migliori passi di montagna per motociclisti e automobilisti in Italia
+          {t('home.subtitle')}
         </p>
 
         {/* CTAs */}
@@ -47,14 +49,14 @@ export default function HomePage() {
             to="/passi"
             className="btn-primary inline-flex items-center gap-2 px-8 py-3.5 text-white rounded-xl font-medium text-sm"
           >
-            Esplora i Passi
+            {t('home.explore')}
             <ArrowRight className="w-4 h-4" />
           </Link>
           <a
             href="#stats"
             className="btn-secondary inline-flex items-center gap-2 px-8 py-3.5 text-gray-300 rounded-xl font-medium text-sm"
           >
-            Scopri di più
+            {t('home.learnMore')}
             <ChevronDown className="w-4 h-4" />
           </a>
         </div>
@@ -75,7 +77,7 @@ export default function HomePage() {
               </div>
               <span className="text-3xl font-display text-white">{passi.length}</span>
             </div>
-            <p className="text-gray-400 text-sm">Passi Disponibili</p>
+            <p className="text-gray-400 text-sm">{t('home.availablePasses')}</p>
           </div>
 
           <div className="glass-card rounded-2xl p-6">
@@ -87,7 +89,7 @@ export default function HomePage() {
                 {Math.max(...passi.map(p => p.elevation), 0).toLocaleString()}m
               </span>
             </div>
-            <p className="text-gray-400 text-sm">Quota Massima</p>
+            <p className="text-gray-400 text-sm">{t('home.maxElevation')}</p>
           </div>
 
           <div className="glass-card rounded-2xl p-6">
@@ -97,7 +99,7 @@ export default function HomePage() {
               </div>
               <span className="text-3xl font-display text-white">2</span>
             </div>
-            <p className="text-gray-400 text-sm">Tipi di Veicoli</p>
+            <p className="text-gray-400 text-sm">{t('home.vehicleTypes')}</p>
           </div>
         </div>
       </section>
@@ -106,7 +108,7 @@ export default function HomePage() {
       {passi.length > 0 && (
         <section className="container mx-auto px-4 pb-20">
           <h2 className="text-3xl md:text-4xl font-display text-white mb-6">
-            Mappa Interattiva
+            {t('home.mapTitle')}
           </h2>
           <div className="glass-card rounded-2xl p-1.5">
             <div className="h-96 rounded-xl overflow-hidden">
@@ -120,13 +122,13 @@ export default function HomePage() {
       <section className="container mx-auto px-4 pb-20">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl md:text-4xl font-display text-white">
-            Passi in Evidenza
+            {t('home.featured')}
           </h2>
           <Link
             to="/passi"
             className="btn-secondary inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm text-gray-300"
           >
-            Vedi tutti
+            {t('home.viewAll')}
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

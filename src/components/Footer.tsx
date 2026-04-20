@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from '@/i18n/useTranslation';
 
 export default function Footer() {
+  const { t } = useTranslation();
+  const year = new Date().getFullYear();
+
   return (
     <footer className="glass-strong border-t border-white/5 relative z-10 mt-auto">
       <div className="container mx-auto px-4 py-10">
@@ -8,60 +12,60 @@ export default function Footer() {
           <div>
             <h3 className="text-2xl font-display text-primary-400 mb-3">TORNØ</h3>
             <p className="text-gray-500 text-sm leading-relaxed">
-              La tua guida ai passi di montagna per motociclisti e automobilisti in Italia.
+              {t('footer.description')}
             </p>
           </div>
           <div>
             <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">
-              Navigazione
+              {t('footer.navigation')}
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link to="/" className="text-gray-500 hover:text-gray-200 transition-colors">
-                  Home
+                  {t('nav.home')}
                 </Link>
               </li>
               <li>
                 <Link to="/passi" className="text-gray-500 hover:text-gray-200 transition-colors">
-                  Passi di Montagna
+                  {t('passi.title')}
                 </Link>
               </li>
               <li>
                 <Link to="/profile" className="text-gray-500 hover:text-gray-200 transition-colors">
-                  Profilo
+                  {t('nav.profile')}
                 </Link>
               </li>
             </ul>
           </div>
           <div>
             <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">
-              Legale
+              {t('footer.legal')}
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <a href="#" className="text-gray-500 hover:text-gray-200 transition-colors">
-                  Privacy Policy
-                </a>
+                <span className="text-gray-500">
+                  {t('footer.privacy')}
+                </span>
               </li>
               <li>
-                <a href="#" className="text-gray-500 hover:text-gray-200 transition-colors">
-                  Termini di Servizio
-                </a>
+                <span className="text-gray-500">
+                  {t('footer.terms')}
+                </span>
               </li>
               <li>
-                <a href="#" className="text-gray-500 hover:text-gray-200 transition-colors">
-                  Contatti
-                </a>
+                <span className="text-gray-500">
+                  {t('footer.contact')}
+                </span>
               </li>
             </ul>
           </div>
         </div>
         <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-gray-600">
-            &copy; {new Date().getFullYear()} TORNØ. Tutti i diritti riservati.
+            {t('footer.rights', { year })}
           </p>
           <p className="text-xs text-gray-700">
-            Fatto con passione per la montagna 🏔
+            {t('footer.madeWith')}
           </p>
         </div>
       </div>

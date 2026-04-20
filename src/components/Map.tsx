@@ -3,9 +3,12 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Passo } from '@/types';
+import { useTranslation } from '@/i18n/useTranslation';
 
 // Fix for default marker icons in React-Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+type LeafletDefaultIconPrototype = L.Icon.Default & { _getIconUrl?: unknown };
+
+delete (L.Icon.Default.prototype as LeafletDefaultIconPrototype)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
@@ -58,6 +61,7 @@ function MapResizer() {
 
 export default function Map({ passi, selectedPasso, center, zoom = 6, className = '' }: MapProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsMounted(true);
@@ -87,7 +91,7 @@ export default function Map({ passi, selectedPasso, center, zoom = 6, className 
   if (!isMounted) {
     return (
       <div className={`rounded-lg overflow-hidden border border-dark-700 bg-dark-800 flex items-center justify-center ${className}`} style={{ height: '100%', minHeight: '400px' }}>
-        <div className="text-gray-400">Caricamento mappa...</div>
+        <div className="text-gray-400">{t('map.loading')}</div>
       </div>
     );
   }
@@ -133,4 +137,3 @@ export default function Map({ passi, selectedPasso, center, zoom = 6, className 
     </div>
   );
 }
-

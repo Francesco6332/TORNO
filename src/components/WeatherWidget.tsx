@@ -1,5 +1,6 @@
 import { Cloud, Droplets, Wind, Eye } from 'lucide-react';
 import { useWeather } from '@/hooks/useWeather';
+import { useTranslation } from '@/i18n/useTranslation';
 
 interface WeatherWidgetProps {
   lat: number;
@@ -8,7 +9,8 @@ interface WeatherWidgetProps {
 }
 
 export default function WeatherWidget({ lat, lng, className = '' }: WeatherWidgetProps) {
-  const { data: weather, isLoading, error } = useWeather(lat, lng);
+  const { language, t } = useTranslation();
+  const { data: weather, isLoading, error } = useWeather(lat, lng, true, language);
 
   if (isLoading) {
     return (
@@ -24,8 +26,8 @@ export default function WeatherWidget({ lat, lng, className = '' }: WeatherWidge
   if (error || !weather) {
     return (
       <div className={`bg-dark-800 rounded-lg p-4 border border-dark-700 ${className}`}>
-        <h4 className="text-sm font-medium text-gray-400 mb-1">Meteo</h4>
-        <p className="text-sm text-gray-500">Dati meteo non disponibili.</p>
+        <h4 className="text-sm font-medium text-gray-400 mb-1">{t('weather.title')}</h4>
+        <p className="text-sm text-gray-500">{t('weather.unavailable')}</p>
       </div>
     );
   }
@@ -38,7 +40,7 @@ export default function WeatherWidget({ lat, lng, className = '' }: WeatherWidge
     <div className={`bg-dark-800 rounded-lg p-4 border border-dark-700 ${className}`}>
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h4 className="text-sm font-medium text-gray-400 mb-1">Meteo</h4>
+          <h4 className="text-sm font-medium text-gray-400 mb-1">{t('weather.title')}</h4>
           <div className="flex items-center space-x-2">
             <span className="text-2xl font-bold text-white">{weather.temp}°</span>
             <span className="text-sm text-gray-400">C</span>
@@ -71,7 +73,7 @@ export default function WeatherWidget({ lat, lng, className = '' }: WeatherWidge
         </div>
         <div className="flex items-center space-x-2 text-xs text-gray-400">
           <Cloud className="w-4 h-4 text-primary-500" />
-          <span>Percepita {weather.feelsLike}°</span>
+          <span>{t('weather.feelsLike', { value: weather.feelsLike })}</span>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import SearchBar from '@/components/SearchBar';
 import Map from '@/components/Map';
 import { Map as MapIcon, List } from 'lucide-react';
 import type { DifficultyLevel, VehicleType } from '@/types';
+import { useTranslation } from '@/i18n/useTranslation';
 
 export default function PassiPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,6 +16,7 @@ export default function PassiPage() {
 
   const { data: allPassi = [], isLoading } = usePassi();
   const { data: searchResults = [] } = useSearchPassi(searchQuery);
+  const { t } = useTranslation();
 
   const filteredPassi = useMemo(() => {
     let passi = searchQuery.length > 2 ? searchResults : allPassi;
@@ -34,10 +36,10 @@ export default function PassiPage() {
       {/* Page header */}
       <div className="mb-10">
         <h1 className="text-5xl md:text-6xl font-display text-white mb-3">
-          Passi di Montagna
+          {t('passi.title')}
         </h1>
         <p className="text-gray-400">
-          Esplora {allPassi.length} passi disponibili per motociclisti e automobilisti
+          {t('passi.subtitle', { count: allPassi.length })}
         </p>
       </div>
 
@@ -56,16 +58,18 @@ export default function PassiPage() {
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6">
         <span className="text-sm text-gray-500">
-          {filteredPassi.length} {filteredPassi.length === 1 ? 'passo' : 'passi'} trovati
+          {t(filteredPassi.length === 1 ? 'passi.results.one' : 'passi.results.other', {
+            count: filteredPassi.length,
+          })}
         </span>
         <button
           onClick={() => setShowMap(!showMap)}
           className="btn-secondary inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-300"
         >
           {showMap ? (
-            <><List className="w-4 h-4" /> Lista</>
+            <><List className="w-4 h-4" /> {t('passi.list')}</>
           ) : (
-            <><MapIcon className="w-4 h-4" /> Mappa</>
+            <><MapIcon className="w-4 h-4" /> {t('passi.map')}</>
           )}
         </button>
       </div>
@@ -79,9 +83,9 @@ export default function PassiPage() {
         </div>
       ) : filteredPassi.length === 0 ? (
         <div className="glass-card rounded-2xl p-16 text-center">
-          <p className="text-gray-300 text-lg mb-2">Nessun passo trovato</p>
+          <p className="text-gray-300 text-lg mb-2">{t('passi.emptyTitle')}</p>
           <p className="text-gray-500 text-sm">
-            Prova a modificare i filtri o la ricerca
+            {t('passi.emptyText')}
           </p>
         </div>
       ) : showMap ? (

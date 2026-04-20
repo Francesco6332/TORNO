@@ -1,13 +1,15 @@
 import { Search, X } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n/useTranslation';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
   placeholder?: string;
 }
 
-export default function SearchBar({ onSearch, placeholder = 'Cerca passi...' }: SearchBarProps) {
+export default function SearchBar({ onSearch, placeholder }: SearchBarProps) {
   const [query, setQuery] = useState('');
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +32,7 @@ export default function SearchBar({ onSearch, placeholder = 'Cerca passi...' }: 
             setQuery(e.target.value);
             onSearch(e.target.value);
           }}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t('search.placeholder')}
           className="w-full pl-10 pr-10 py-3 bg-dark-800 border border-dark-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
         />
         {query && (
@@ -46,4 +48,3 @@ export default function SearchBar({ onSearch, placeholder = 'Cerca passi...' }: 
     </form>
   );
 }
-

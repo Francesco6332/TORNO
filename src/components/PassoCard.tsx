@@ -7,6 +7,7 @@ import { useState } from 'react';
 import type { Passo } from '@/types';
 import clsx from 'clsx';
 import { getPassoImageUrlCandidates } from '@/utils/imageUtils';
+import { useTranslation } from '@/i18n/useTranslation';
 
 interface PassoCardProps {
   passo: Passo;
@@ -17,6 +18,7 @@ export default function PassoCard({ passo }: PassoCardProps) {
   const [imageError, setImageError] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
+  const { t } = useTranslation();
 
   const imageUrls = getPassoImageUrlCandidates(passo);
   const imageUrl = imageUrls[imageIndex];
@@ -100,10 +102,14 @@ export default function PassoCard({ passo }: PassoCardProps) {
               difficulty.color === 'orange' && 'bg-orange-500/15 text-orange-400 border border-orange-500/20',
               difficulty.color === 'red' && 'bg-red-500/15 text-red-400 border border-red-500/20',
             )}>
-              {difficulty.icon} {difficulty.label}
+              {difficulty.icon} {t(`difficulty.${difficulty.value}`)}
             </span>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/6 text-gray-400 border border-white/8">
-              {passo.vehicleType === 'both' ? 'Moto/Auto' : passo.vehicleType === 'motorcycle' ? 'Moto' : 'Auto'}
+              {passo.vehicleType === 'both'
+                ? t('vehicle.bothShort')
+                : passo.vehicleType === 'motorcycle'
+                  ? t('vehicle.motorcycle')
+                  : t('vehicle.car')}
             </span>
           </div>
         </div>
