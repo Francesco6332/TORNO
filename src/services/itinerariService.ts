@@ -4,9 +4,11 @@ import {
   doc,
   getDoc,
   getDocs,
+  runTransaction,
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
+import { removeUndefinedValues } from '@/utils/firestoreUtils';
 import type { Itinerary, NewItineraryInput } from '@/types';
 
 const COLLECTION = 'itinerari';
@@ -47,12 +49,41 @@ export const itinerariService = {
 
   async create(input: NewItineraryInput): Promise<string> {
     const docRef = await addDoc(collectionRef, {
-      ...input,
+      ...removeUndefinedValues(input),
+      upvotedBy: [],
+      upvoteCount: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
 
     return docRef.id;
+  },
+
+  async toggleUpvote(id: string, userId: string): Promise<{ upvotedBy: string[]; upvoteCount: number }> {
+    const docRef = doc(db, COLLECTION, id);
+
+    return runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(docRef);
+
+      if (!snapshot.exists()) {
+        throw new Error('Itinerary not found');
+      }
+
+      const data = snapshot.data();
+      const currentUpvotedBy = Array.isArray(data.upvotedBy) ? data.upvotedBy as string[] : [];
+      const hasUpvoted = currentUpvotedBy.includes(userId);
+      const upvotedBy = hasUpvoted
+        ? currentUpvotedBy.filter((id) => id !== userId)
+        : [...currentUpvotedBy, userId];
+
+      transaction.update(docRef, {
+        upvotedBy,
+        upvoteCount: upvotedBy.length,
+        updatedAt: serverTimestamp(),
+      });
+
+      return { upvotedBy, upvoteCount: upvotedBy.length };
+    });
   },
 
   async search(searchText: string): Promise<Itinerary[]> {

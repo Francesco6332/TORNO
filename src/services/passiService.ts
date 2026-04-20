@@ -1,12 +1,31 @@
-import { collection, getDocs, doc, getDoc, query, orderBy } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  runTransaction,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { CACHE_DURATION } from '@/config/constants';
 import { cacheManager } from '@/utils/cache';
-import type { Passo, DifficultyLevel, VehicleType } from '@/types';
+import { removeUndefinedValues } from '@/utils/firestoreUtils';
+import type { DifficultyLevel, NewPassoInput, Passo, VehicleType } from '@/types';
 
 const COLLECTION_NAME = 'passi';
 const CACHE_KEY_ALL = 'passi_all';
 const CACHE_KEY_DETAIL = 'passo_detail_';
+const collectionRef = collection(db, COLLECTION_NAME);
+
+const clearPassiCache = (id?: string) => {
+  cacheManager.remove(CACHE_KEY_ALL);
+  if (id) {
+    cacheManager.remove(`${CACHE_KEY_DETAIL}${id}`);
+  }
+};
 
 export const passiService = {
   async getAll(): Promise<Passo[]> {
@@ -16,7 +35,7 @@ export const passiService = {
     }
 
     try {
-      const q = query(collection(db, COLLECTION_NAME), orderBy('name'));
+      const q = query(collectionRef, orderBy('name'));
       const querySnapshot = await getDocs(q);
       
       const passi: Passo[] = querySnapshot.docs.map(doc => ({
@@ -64,6 +83,49 @@ export const passiService = {
     }
   },
 
+  async create(input: NewPassoInput): Promise<string> {
+    const docRef = await addDoc(collectionRef, {
+      ...removeUndefinedValues(input),
+      upvotedBy: [],
+      upvoteCount: 0,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    clearPassiCache();
+    return docRef.id;
+  },
+
+  async toggleUpvote(id: string, userId: string): Promise<{ upvotedBy: string[]; upvoteCount: number }> {
+    const docRef = doc(db, COLLECTION_NAME, id);
+
+    const result = await runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(docRef);
+
+      if (!snapshot.exists()) {
+        throw new Error('Passo not found');
+      }
+
+      const data = snapshot.data();
+      const currentUpvotedBy = Array.isArray(data.upvotedBy) ? data.upvotedBy as string[] : [];
+      const hasUpvoted = currentUpvotedBy.includes(userId);
+      const upvotedBy = hasUpvoted
+        ? currentUpvotedBy.filter((id) => id !== userId)
+        : [...currentUpvotedBy, userId];
+
+      transaction.update(docRef, {
+        upvotedBy,
+        upvoteCount: upvotedBy.length,
+        updatedAt: serverTimestamp(),
+      });
+
+      return { upvotedBy, upvoteCount: upvotedBy.length };
+    });
+
+    clearPassiCache(id);
+    return result;
+  },
+
   async getByDifficulty(difficulty: DifficultyLevel): Promise<Passo[]> {
     const allPassi = await this.getAll();
     return allPassi.filter(p => p.difficulty === difficulty);
@@ -91,4 +153,3 @@ export const passiService = {
     );
   },
 };
-

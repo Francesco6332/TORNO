@@ -5,6 +5,9 @@ import { getImageUrlSafe } from '@/utils/imageUtils';
 import { useTranslation } from '@/i18n/useTranslation';
 import type { Itinerary } from '@/types';
 import clsx from 'clsx';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToggleItineraryUpvote } from '@/hooks/useItinerari';
+import UpvoteButton from './UpvoteButton';
 
 interface ItinerarioCardProps {
   itinerary: Itinerary;
@@ -14,6 +17,8 @@ export default function ItinerarioCard({ itinerary }: ItinerarioCardProps) {
   const [imageError, setImageError] = useState(false);
   const difficulty = DIFFICULTY_LEVELS[itinerary.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
   const { t } = useTranslation();
+  const { user, signInWithGoogle } = useAuth();
+  const toggleUpvote = useToggleItineraryUpvote();
 
   const imageUrl =
     itinerary.images && itinerary.images.length > 0
@@ -21,6 +26,20 @@ export default function ItinerarioCard({ itinerary }: ItinerarioCardProps) {
       : null;
   const passCountKey =
     itinerary.passi.length === 1 ? 'itinerari.passCount.one' : 'itinerari.passCount.other';
+  const upvoteCount = itinerary.upvoteCount ?? itinerary.upvotedBy?.length ?? 0;
+  const isUpvoted = user ? Boolean(itinerary.upvotedBy?.includes(user.uid)) : false;
+
+  const handleUpvote = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!user) {
+      await signInWithGoogle();
+      return;
+    }
+
+    toggleUpvote.mutate({ itineraryId: itinerary.id, userId: user.uid });
+  };
 
   return (
     <article
@@ -52,6 +71,15 @@ export default function ItinerarioCard({ itinerary }: ItinerarioCardProps) {
             <span>{t(passCountKey, { count: itinerary.passi.length })}</span>
           </div>
         )}
+        <div className="absolute top-3 right-3">
+          <UpvoteButton
+            count={upvoteCount}
+            isUpvoted={isUpvoted}
+            isLoading={toggleUpvote.isPending}
+            compact
+            onClick={handleUpvote}
+          />
+        </div>
 
         {/* Title overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4">

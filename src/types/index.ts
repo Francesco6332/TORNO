@@ -18,6 +18,9 @@ export interface Passo {
   surface?: string;
   images?: string[];
   tags?: string[];
+  createdBy?: User;
+  upvotedBy?: string[];
+  upvoteCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -64,8 +67,29 @@ export interface Itinerary {
   images?: string[];
   tags?: string[];
   createdBy: User;
+  upvotedBy?: string[];
+  upvoteCount?: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface NewPassoInput {
+  name: string;
+  region: string;
+  elevation: number;
+  difficulty: DifficultyLevel;
+  vehicleType: VehicleType;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+  description: string;
+  length?: number;
+  maxGradient?: number;
+  surface?: string;
+  images?: string[];
+  tags?: string[];
+  createdBy: User;
 }
 
 export interface NewItineraryInput {

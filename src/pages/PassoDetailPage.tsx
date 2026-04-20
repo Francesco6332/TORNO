@@ -12,6 +12,9 @@ import { it } from 'date-fns/locale/it';
 import { enUS } from 'date-fns/locale/en-US';
 import { getPassoImageUrlCandidates } from '@/utils/imageUtils';
 import { useTranslation } from '@/i18n/useTranslation';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTogglePassoUpvote } from '@/hooks/usePassi';
+import UpvoteButton from '@/components/UpvoteButton';
 
 export default function PassoDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +23,8 @@ export default function PassoDetailPage() {
   const [imageError, setImageError] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
   const { language, t } = useTranslation();
+  const { user, signInWithGoogle } = useAuth();
+  const toggleUpvoteMutation = useTogglePassoUpvote();
 
   const imageUrls = passo ? getPassoImageUrlCandidates(passo) : [];
   const imageUrl = imageUrls[imageIndex];
@@ -51,6 +56,19 @@ export default function PassoDetailPage() {
     setIsFavorite(!isFavorite);
   };
 
+  const handleUpvote = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+
+    if (!passo) return;
+
+    if (!user) {
+      await signInWithGoogle();
+      return;
+    }
+
+    toggleUpvoteMutation.mutate({ passoId: passo.id, userId: user.uid });
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-10">
@@ -67,6 +85,8 @@ export default function PassoDetailPage() {
 
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
   const dateLocale = language === 'it' ? it : enUS;
+  const upvoteCount = passo.upvoteCount ?? passo.upvotedBy?.length ?? 0;
+  const isUpvoted = user ? Boolean(passo.upvotedBy?.includes(user.uid)) : false;
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -114,6 +134,12 @@ export default function PassoDetailPage() {
           >
             <Heart className={clsx('w-5 h-5', isFavorite && 'fill-current')} />
           </button>
+          <UpvoteButton
+            count={upvoteCount}
+            isUpvoted={isUpvoted}
+            isLoading={toggleUpvoteMutation.isPending}
+            onClick={handleUpvote}
+          />
         </div>
 
         {/* Badges */}

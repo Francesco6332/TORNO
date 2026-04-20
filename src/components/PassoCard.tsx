@@ -8,6 +8,9 @@ import type { Passo } from '@/types';
 import clsx from 'clsx';
 import { getPassoImageUrlCandidates } from '@/utils/imageUtils';
 import { useTranslation } from '@/i18n/useTranslation';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTogglePassoUpvote } from '@/hooks/usePassi';
+import UpvoteButton from './UpvoteButton';
 
 interface PassoCardProps {
   passo: Passo;
@@ -19,6 +22,8 @@ export default function PassoCard({ passo }: PassoCardProps) {
   const [imageIndex, setImageIndex] = useState(0);
   const difficulty = DIFFICULTY_LEVELS[passo.difficulty.toUpperCase() as keyof typeof DIFFICULTY_LEVELS];
   const { t } = useTranslation();
+  const { user, signInWithGoogle } = useAuth();
+  const toggleUpvote = useTogglePassoUpvote();
 
   const imageUrls = getPassoImageUrlCandidates(passo);
   const imageUrl = imageUrls[imageIndex];
@@ -41,6 +46,21 @@ export default function PassoCard({ passo }: PassoCardProps) {
     }
     setIsFavorite(!isFavorite);
   };
+
+  const handleUpvote = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!user) {
+      await signInWithGoogle();
+      return;
+    }
+
+    toggleUpvote.mutate({ passoId: passo.id, userId: user.uid });
+  };
+
+  const upvoteCount = passo.upvoteCount ?? passo.upvotedBy?.length ?? 0;
+  const isUpvoted = user ? Boolean(passo.upvotedBy?.includes(user.uid)) : false;
 
   return (
     <Link
@@ -78,6 +98,15 @@ export default function PassoCard({ passo }: PassoCardProps) {
         >
           <Heart className={clsx('w-4 h-4', isFavorite && 'fill-current')} />
         </button>
+        <div className="absolute top-3 left-3">
+          <UpvoteButton
+            count={upvoteCount}
+            isUpvoted={isUpvoted}
+            isLoading={toggleUpvote.isPending}
+            compact
+            onClick={handleUpvote}
+          />
+        </div>
 
         {/* Name overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4">

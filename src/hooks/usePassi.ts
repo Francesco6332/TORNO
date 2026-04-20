@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { passiService } from '@/services/passiService';
-import type { DifficultyLevel, VehicleType } from '@/types';
+import type { DifficultyLevel, NewPassoInput, VehicleType } from '@/types';
 
 export const usePassi = () => {
   return useQuery({
@@ -39,3 +39,26 @@ export const useSearchPassi = (searchQuery: string) => {
   });
 };
 
+export const useCreatePasso = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: NewPassoInput) => passiService.create(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['passi'] });
+    },
+  });
+};
+
+export const useTogglePassoUpvote = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ passoId, userId }: { passoId: string; userId: string }) =>
+      passiService.toggleUpvote(passoId, userId),
+    onSuccess: (_result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['passi'] });
+      queryClient.invalidateQueries({ queryKey: ['passo', variables.passoId] });
+    },
+  });
+};

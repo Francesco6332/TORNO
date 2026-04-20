@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { usePassi, useSearchPassi } from '@/hooks/usePassi';
 import PassoCard from '@/components/PassoCard';
 import FilterBar from '@/components/FilterBar';
 import SearchBar from '@/components/SearchBar';
 import Map from '@/components/Map';
-import { Map as MapIcon, List } from 'lucide-react';
+import { Map as MapIcon, List, Plus } from 'lucide-react';
 import type { DifficultyLevel, VehicleType } from '@/types';
 import { useTranslation } from '@/i18n/useTranslation';
 
@@ -34,13 +35,22 @@ export default function PassiPage() {
   return (
     <div className="container mx-auto px-4 py-10">
       {/* Page header */}
-      <div className="mb-10">
-        <h1 className="text-5xl md:text-6xl font-display text-white mb-3">
-          {t('passi.title')}
-        </h1>
-        <p className="text-gray-400">
-          {t('passi.subtitle', { count: allPassi.length })}
-        </p>
+      <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h1 className="text-5xl md:text-6xl font-display text-white mb-3">
+            {t('passi.title')}
+          </h1>
+          <p className="text-gray-400">
+            {t('passi.subtitle', { count: allPassi.length })}
+          </p>
+        </div>
+        <Link
+          to="/passi/nuovo"
+          className="btn-primary inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-medium text-white"
+        >
+          <Plus className="w-4 h-4" />
+          {t('passi.create')}
+        </Link>
       </div>
 
       {/* Search + Filters — glass panel */}

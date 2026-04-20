@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import PassiPage from './pages/PassiPage';
+import NewPassoPage from './pages/NewPassoPage';
 import ItinerariPage from './pages/ItinerariPage';
 import NewItineraryPage from './pages/NewItineraryPage';
 import PassoDetailPage from './pages/PassoDetailPage';
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/passi" element={<PassiPage />} />
+            <Route path="/passi/nuovo" element={<NewPassoPage />} />
             <Route path="/itinerari" element={<ItinerariPage />} />
             <Route path="/itinerari/nuovo" element={<NewItineraryPage />} />
             <Route path="/passi/:id" element={<PassoDetailPage />} />

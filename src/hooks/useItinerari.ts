@@ -35,3 +35,15 @@ export function useCreateItinerary() {
     },
   });
 }
+
+export function useToggleItineraryUpvote() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ itineraryId, userId }: { itineraryId: string; userId: string }) =>
+      itinerariService.toggleUpvote(itineraryId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['itinerari'] });
+    },
+  });
+}
