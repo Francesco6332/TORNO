@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { DIFFICULTY_LEVELS } from '@/config/constants';
 import { useCreatePasso } from '@/hooks/usePassi';
 import { useTranslation } from '@/i18n/useTranslation';
+import { imageUploadService } from '@/services/imageUploadService';
 import type { DifficultyLevel, VehicleType } from '@/types';
 
 const vehicleTypes: VehicleType[] = ['motorcycle', 'car', 'both'];
@@ -28,8 +29,10 @@ export default function NewPassoPage() {
   const [maxGradient, setMaxGradient] = useState('');
   const [surface, setSurface] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [tagsText, setTagsText] = useState('');
   const [error, setError] = useState('');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -74,6 +77,11 @@ export default function NewPassoPage() {
     }
 
     try {
+      setIsUploadingImage(true);
+      const uploadedImageUrl = imageFile
+        ? await imageUploadService.upload(imageFile, 'passi')
+        : imageUrl.trim();
+
       const passoId = await createPasso.mutateAsync({
         name: name.trim(),
         region: region.trim(),
@@ -88,7 +96,7 @@ export default function NewPassoPage() {
         length: parsedLength,
         maxGradient: parsedMaxGradient,
         surface: surface.trim() || undefined,
-        images: imageUrl.trim() ? [imageUrl.trim()] : [],
+        images: uploadedImageUrl ? [uploadedImageUrl] : [],
         tags: tagsText
           .split(',')
           .map((tag) => tag.trim())
@@ -104,6 +112,8 @@ export default function NewPassoPage() {
       navigate(`/passi/${passoId}`, { replace: true });
     } catch {
       setError(t('passi.form.errors.save'));
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -340,13 +350,28 @@ export default function NewPassoPage() {
           <section className="glass-card rounded-2xl p-6 space-y-5">
             <h2 className="text-2xl font-display text-white">{t('passi.form.media')}</h2>
             <div>
+              <label htmlFor="imageFile" className="block text-sm font-medium text-gray-400 mb-2">
+                {t('passi.form.fields.imageUpload')}
+              </label>
+              <input
+                id="imageFile"
+                type="file"
+                accept="image/*"
+                onChange={(event) => setImageFile(event.target.files?.[0] || null)}
+                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-lg text-white file:mr-4 file:rounded-md file:border-0 file:bg-primary-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <p className="mt-2 text-xs text-gray-500">{t('passi.form.imageHelp')}</p>
+            </div>
+
+            <div>
               <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-400 mb-2">
-                {t('passi.form.fields.image')}
+                {t('passi.form.fields.imageUrl')}
               </label>
               <input
                 id="imageUrl"
                 value={imageUrl}
                 onChange={(event) => setImageUrl(event.target.value)}
+                disabled={Boolean(imageFile)}
                 className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder={t('passi.form.placeholders.image')}
               />
@@ -369,11 +394,11 @@ export default function NewPassoPage() {
 
             <button
               type="submit"
-              disabled={createPasso.isPending}
+              disabled={createPasso.isPending || isUploadingImage}
               className="btn-primary w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 text-white rounded-xl font-medium text-sm disabled:opacity-60"
             >
-              {createPasso.isPending ? (
-                t('passi.form.saving')
+              {createPasso.isPending || isUploadingImage ? (
+                isUploadingImage ? t('imageUpload.uploading') : t('passi.form.saving')
               ) : (
                 <>
                   <Save className="w-4 h-4" />

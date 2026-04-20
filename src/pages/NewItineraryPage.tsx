@@ -7,6 +7,7 @@ import { DIFFICULTY_LEVELS } from '@/config/constants';
 import { usePassi } from '@/hooks/usePassi';
 import { useCreateItinerary } from '@/hooks/useItinerari';
 import { useTranslation } from '@/i18n/useTranslation';
+import { imageUploadService } from '@/services/imageUploadService';
 import type { DifficultyLevel, Passo, VehicleType } from '@/types';
 
 const vehicleTypes: VehicleType[] = ['motorcycle', 'car', 'both'];
@@ -39,10 +40,12 @@ export default function NewItineraryPage() {
   const [vehicleType, setVehicleType] = useState<VehicleType>('both');
   const [selectedPassoIds, setSelectedPassoIds] = useState<string[]>([]);
   const [imageUrl, setImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [tagsText, setTagsText] = useState('');
   const [manualLength, setManualLength] = useState('');
   const [manualTime, setManualTime] = useState('');
   const [error, setError] = useState('');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const selectedPassi = useMemo(
     () =>
@@ -117,6 +120,11 @@ export default function NewItineraryPage() {
     }
 
     try {
+      setIsUploadingImage(true);
+      const uploadedImageUrl = imageFile
+        ? await imageUploadService.upload(imageFile, 'itinerari')
+        : imageUrl.trim();
+
       const itineraryId = await createItinerary.mutateAsync({
         title: title.trim(),
         description: description.trim(),
@@ -127,7 +135,7 @@ export default function NewItineraryPage() {
         totalLength,
         totalElevationGain,
         estimatedTime,
-        images: imageUrl.trim() ? [imageUrl.trim()] : [],
+        images: uploadedImageUrl ? [uploadedImageUrl] : [],
         tags: tagsText
           .split(',')
           .map((tag) => tag.trim())
@@ -143,6 +151,8 @@ export default function NewItineraryPage() {
       navigate('/itinerari', { replace: true, state: { createdItineraryId: itineraryId } });
     } catch {
       setError(t('itinerari.form.errors.save'));
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -238,13 +248,28 @@ export default function NewItineraryPage() {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2" htmlFor="imageFile">
+                  {t('itinerari.form.fields.imageUpload')}
+                </label>
+                <input
+                  id="imageFile"
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => setImageFile(event.target.files?.[0] || null)}
+                  className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-lg text-white file:mr-4 file:rounded-md file:border-0 file:bg-primary-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+                <p className="mt-2 text-xs text-gray-500">{t('itinerari.form.imageHelp')}</p>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-400 mb-2" htmlFor="imageUrl">
-                  {t('itinerari.form.fields.image')}
+                  {t('itinerari.form.fields.imageUrl')}
                 </label>
                 <input
                   id="imageUrl"
                   value={imageUrl}
                   onChange={(event) => setImageUrl(event.target.value)}
+                  disabled={Boolean(imageFile)}
                   className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder={t('itinerari.form.placeholders.image')}
                 />
@@ -449,11 +474,11 @@ export default function NewItineraryPage() {
 
             <button
               type="submit"
-              disabled={createItinerary.isPending}
+              disabled={createItinerary.isPending || isUploadingImage}
               className="btn-primary w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 text-white rounded-xl font-medium text-sm disabled:opacity-60"
             >
-              {createItinerary.isPending ? (
-                t('itinerari.form.saving')
+              {createItinerary.isPending || isUploadingImage ? (
+                isUploadingImage ? t('imageUpload.uploading') : t('itinerari.form.saving')
               ) : (
                 <>
                   <Save className="w-4 h-4" />
