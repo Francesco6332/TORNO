@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,7 +12,7 @@ import type { DifficultyLevel, VehicleType } from '@/types';
 const vehicleTypes: VehicleType[] = ['motorcycle', 'car', 'both'];
 
 export default function NewPassoPage() {
-  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const { user } = useAuth();
   const createPasso = useCreatePasso();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -116,34 +116,6 @@ export default function NewPassoPage() {
       setIsUploadingImage(false);
     }
   };
-
-  if (!authLoading && !user) {
-    return (
-      <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-[70vh]">
-        <div className="glass-card rounded-2xl p-10 w-full max-w-md text-center">
-          <h1 className="text-4xl font-display text-white mb-3">{t('passi.form.signInTitle')}</h1>
-          <p className="text-gray-400 text-sm mb-8">{t('passi.form.signInText')}</p>
-          <button
-            type="button"
-            onClick={signInWithGoogle}
-            className="btn-primary inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-medium text-white"
-          >
-            {t('profile.googleSignIn')}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (authLoading) {
-    return (
-      <div className="container mx-auto px-4 py-10">
-        <div className="glass-card rounded-2xl h-80 animate-pulse" />
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/profile" replace />;
 
   return (
     <div className="container mx-auto px-4 py-10">

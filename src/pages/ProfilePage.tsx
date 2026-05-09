@@ -1,16 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { User, Mail, LogOut, Heart, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { usePassi } from '@/hooks/usePassi';
 import PassoCard from '@/components/PassoCard';
 import { favoritesStorage, recentViewsStorage } from '@/utils/storage';
 import { useTranslation } from '@/i18n/useTranslation';
+import type { Location } from 'react-router-dom';
 
 export default function ProfilePage() {
   const { user, loading, signInWithGoogle, logout } = useAuth();
   const [error, setError] = useState('');
   const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = (location.state as { from?: Location })?.from?.pathname;
+
+  useEffect(() => {
+    if (user && !loading && from) {
+      navigate(from, { replace: true });
+    }
+  }, [user, loading, from, navigate]);
 
   const { data: allPassi = [] } = usePassi();
   const favoriteIds = favoritesStorage.get();
