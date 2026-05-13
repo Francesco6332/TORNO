@@ -22,11 +22,12 @@ const getUploadErrorMessage = async (response: Response): Promise<string> => {
 };
 
 export const imageUploadService = {
-  async upload(file: File, folder: string): Promise<string> {
+  async upload(file: File, folder: string, authToken?: string): Promise<string> {
     const signedUrlResponse = await fetch('/api/upload-url', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify({
         contentType: file.type,

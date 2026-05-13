@@ -121,8 +121,9 @@ export default function NewItineraryPage() {
 
     try {
       setIsUploadingImage(true);
+      const authToken = await user.getIdToken();
       const uploadedImageUrl = imageFile
-        ? await imageUploadService.upload(imageFile, 'itinerari')
+        ? await imageUploadService.upload(imageFile, 'itinerari', authToken)
         : imageUrl.trim();
 
       const itineraryId = await createItinerary.mutateAsync({
