@@ -1,4 +1,6 @@
 import crypto from 'node:crypto';
+import { getApps, initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 
 interface UploadUrlRequest {
   fileName?: string;
@@ -9,6 +11,7 @@ interface UploadUrlRequest {
 interface VercelRequest {
   method?: string;
   body?: UploadUrlRequest | string;
+  headers?: Record<string, string | string[] | undefined>;
 }
 
 interface VercelResponse {
@@ -52,6 +55,23 @@ const getSpacesHost = (bucket: string, region: string, endpoint = '') => {
 const parseBody = (body: UploadUrlRequest | string | undefined): UploadUrlRequest => {
   if (!body) return {};
   return typeof body === 'string' ? JSON.parse(body) as UploadUrlRequest : body;
+};
+
+const getAuthTokenFromHeader = (authorizationHeader: string | string[] | undefined) => {
+  const value = Array.isArray(authorizationHeader) ? authorizationHeader[0] : authorizationHeader;
+  if (!value) return '';
+  const match = value.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || '';
+};
+
+const verifyFirebaseToken = async (token: string) => {
+  if (!getApps().length) {
+    initializeApp({
+      projectId: process.env.FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID,
+    });
+  }
+
+  return getAuth().verifyIdToken(token);
 };
 
 const sanitizeFileName = (fileName: string) => {
@@ -136,9 +156,14 @@ const createPresignedPutUrl = ({
 };
 
 export default function handler(request: VercelRequest, response: VercelResponse) {
-  response.setHeader('Access-Control-Allow-Origin', '*');
+  const allowedOrigins = [
+    'https://torno1.vercel.app',
+    'http://localhost:5173',
+  ];
+  const origin = Array.isArray(request.headers?.origin) ? request.headers.origin[0] : request.headers?.origin;
+  response.setHeader('Access-Control-Allow-Origin', allowedOrigins.includes(origin || '') ? origin || '' : allowedOrigins[0]);
   response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (request.method === 'OPTIONS') {
     response.status(204).json({});
@@ -147,6 +172,13 @@ export default function handler(request: VercelRequest, response: VercelResponse
 
   if (request.method !== 'POST') {
     response.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  const token = getAuthTokenFromHeader(request.headers?.authorization);
+
+  if (!token) {
+    response.status(401).json({ error: 'Missing authorization token' });
     return;
   }
 
@@ -197,6 +229,8 @@ export default function handler(request: VercelRequest, response: VercelResponse
   }
 
   try {
+    await verifyFirebaseToken(token);
+
     const { contentType = '', fileName = '', folder = 'uploads' } = parseBody(request.body);
 
     if (!contentType.startsWith('image/')) {

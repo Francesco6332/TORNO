@@ -78,8 +78,9 @@ export default function NewPassoPage() {
 
     try {
       setIsUploadingImage(true);
+      const authToken = await user.getIdToken();
       const uploadedImageUrl = imageFile
-        ? await imageUploadService.upload(imageFile, 'passi')
+        ? await imageUploadService.upload(imageFile, 'passi', authToken)
         : imageUrl.trim();
 
       const passoId = await createPasso.mutateAsync({
